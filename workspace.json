@@ -78,14 +78,16 @@
       "projectType": "library",
       "targets": {
         "build": {
+          "executor": "@nrwl/workspace:run-commands",
           "outputs": [
             "dist/packages"
           ],
           "options": {
-            "commands": [],
+            "commands": [
+              "nx run sendbird:build.all"
+            ],
             "parallel": false
-          },
-          "executor": "@nrwl/workspace:run-commands"
+          }
         },
         "focus": {
           "outputs": [
@@ -98,6 +100,51 @@
             "parallel": false
           },
           "executor": "@nrwl/workspace:run-commands"
+        }
+      }
+    },
+    "sendbird": {
+      "root": "packages/sendbird",
+      "projectType": "library",
+      "sourceRoot": "packages/sendbird",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:package",
+          "options": {
+            "outputPath": "dist/packages/sendbird",
+            "tsConfig": "packages/sendbird/tsconfig.json",
+            "packageJson": "packages/sendbird/package.json",
+            "main": "packages/sendbird/index.d.ts",
+            "assets": [
+              "packages/sendbird/*.md",
+              "packages/sendbird/index.d.ts",
+              "LICENSE",
+              {
+                "glob": "**/*",
+                "input": "packages/sendbird/platforms/",
+                "output": "./platforms/"
+              }
+            ]
+          }
+        },
+        "build.all": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "nx run sendbird:build",
+              "node tools/scripts/build-finish.ts sendbird"
+            ],
+            "parallel": false
+          }
+        },
+        "focus": {
+          "executor": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              "nx g @nativescript/plugin-tools:focus-packages sendbird"
+            ],
+            "parallel": false
+          }
         }
       }
     }

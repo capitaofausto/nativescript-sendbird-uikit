@@ -24,7 +24,7 @@ npm run setup
 npm start
 ```
 
-- @nativescript
+- @nativescript/sendbird
 
 # How to use?
 

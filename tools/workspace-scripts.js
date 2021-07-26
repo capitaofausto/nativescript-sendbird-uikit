@@ -63,6 +63,13 @@ module.exports = {
 		// packages
 		// build output is always in dist/packages
 		'@nativescript': {
+			// @nativescript/sendbird
+			'sendbird': {
+				build: {
+					script: 'nx run sendbird:build.all',
+					description: '@nativescript/sendbird: Build',
+				},
+			},
 			'build-all': {
 				script: 'nx run all:build',
 				description: 'Build all packages',
@@ -73,6 +80,10 @@ module.exports = {
 			description: '_____________  Focus (VS Code supported)  _____________',
 		},
 		focus: {
+			'sendbird': {
+				script: 'nx run sendbird:focus',
+				description: 'Focus on @nativescript/sendbird',
+			},
 			reset: {
 				script: 'nx run all:focus',
 				description: 'Reset Focus',

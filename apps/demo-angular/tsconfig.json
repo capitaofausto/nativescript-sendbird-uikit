@@ -16,7 +16,15 @@
       "@demo/shared": [
         "../../tools/demo/index.ts"
       ]
-    }
+    },
+    "target": "es2017",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "removeComments": false,
+    "lib": [
+      "es2017"
+    ]
   },
   "files": [
     "./references.d.ts",

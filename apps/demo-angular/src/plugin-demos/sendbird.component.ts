@@ -17,17 +17,17 @@ export class SendbirdComponent {
 
   ngOnInit() {
     // this.demoShared = new DemoSharedSendbird();
-    this.sendbird.init()
+    // this.sendbird.init()
   }
 
   start() {
-    this.sendbird.connect('bento')
+    // this.sendbird.connect('bento')
   }
 
   createChannel() {
-    this.sendbird.createChannel().then(res => {
+    /* this.sendbird.createChannel().then(res => {
       this.channelUrl = res.data
-    })
+    }) */
   }
 
   enterChannel() {

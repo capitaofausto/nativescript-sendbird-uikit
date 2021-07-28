@@ -1,6 +1,6 @@
 import { Component, NgZone } from '@angular/core';
 // import { DemoSharedSendbird } from '@demo/shared';
-import { Sendbird } from '@nativescript/sendbird';
+import { Sendbird, SendBirdUIKit } from '@nativescript/sendbird';
 
 @Component({
 	selector: 'demo-sendbird',
@@ -10,6 +10,7 @@ export class SendbirdComponent {
 
   // demoShared: DemoSharedSendbird;
   sendbird = new Sendbird()
+  sendbirdUiKit = new SendBirdUIKit()
   private channelUrl: string
 
 	constructor(private _ngZone: NgZone) {}
@@ -31,14 +32,21 @@ export class SendbirdComponent {
 
   enterChannel() {
     this.sendbird.enterChannel(this.channelUrl).then(res => {
-      console.log('res:', res.data)
+      console.log('ENTERED CHANNEL')
+      this.sendbird.receiveMessage().then(res => {
+        console.log('res:', res)
+      })
     })
   }
 
   sendMessage() {
     this.sendbird.sendMessage('Hello from app').then(res => {
-      console.log('res:', res.data)
+      // console.log('res:', res.data)
     })
+  }
+
+  uiKitInit() {
+    this.sendbirdUiKit.init()
   }
 
 }

@@ -67,16 +67,34 @@ class SendMessage extends com.sendbird.android.OpenChannel.SendUserMessageHandle
 	}
 }
 
+class MyChannelHandler extends com.sendbird.android.SendBird.ChannelHandler {
+	// constructor(resolve, reject) {}
+
+  onMessageReceived(channel, message) {
+    console.log('channel:', channel)
+    console.log('hello')
+  }
+}
+
+class ChannelByUrl extends com.sendbird.android.OpenChannel.OpenChannelGetHandler {
+	constructor(resolve, reject) {
+		super({
+			onResult(openChannel, e) {
+				if (e != null) {
+					return reject({ error: e });
+				}
+				return resolve({ data: openChannel });
+			},
+		});
+	}
+}
+
 export class Sendbird extends SendbirdCommon {
 	private sendbird = com.sendbird.android.SendBird;
 	private sendbirdChannel: com.sendbird.android.OpenChannel;
 
-	private getApplicationContext(): android.content.Context {
-		return application.android.context;
-	}
-
 	init() {
-		this.sendbird.init(APP_ID, this.getApplicationContext());
+		this.sendbird.init(APP_ID, application.android.context);
 	}
 
 	connect(userId: string) {
@@ -122,4 +140,66 @@ export class Sendbird extends SendbirdCommon {
 			this.sendbirdChannel.sendUserMessage(message, sendMessageHandler);
 		});
 	}
+
+	receiveMessage(channelUrl) {
+		return new Promise((resolve, reject) => {
+      console.log('receiveMessage')
+			const channelHandler = new MyChannelHandler();
+      console.log('receiveMessage1')
+			this.sendbird.addChannelHandler('test', channelHandler);
+		});
+	}
+
+	getChannelByUrl(channelUrl: string) {
+		return new Promise((resolve, reject) => {
+			const channelHandler = new ChannelByUrl(resolve, reject);
+			com.sendbird.android.OpenChannel.getChannel(channelUrl, channelHandler);
+		});
+	}
 }
+
+class UserInfo extends com.sendbird.uikit.interfaces.UserInfo {
+  constructor() {
+    super({
+      getNickname() {
+        // TODO Get User Nickname
+        return 'Nickname'
+      },
+      getProfileUrl(): string {
+        return ''
+      },
+      getUserId() {
+        // TODO Get User ID
+        return 'ID'
+      }
+    })
+  }
+}
+
+class SendBirdUIKitAdapter extends com.sendbird.uikit.adapter.SendBirdUIKitAdapter {
+  constructor() {
+    super({
+      getAppId(): string {
+        return APP_ID
+      },
+      getAccessToken(): string {
+        return ''
+      },
+      getUserInfo(): com.sendbird.uikit.interfaces.UserInfo {
+        return new UserInfo()
+      }
+    })
+  }
+}
+
+export class SendBirdUIKit extends android.app.Application {
+
+  sendBirdUIKit = com.sendbird.uikit.SendBirdUIKit
+
+  init() {
+    super.onCreate()
+    const uiKitAdapter = new SendBirdUIKitAdapter()
+    this.sendBirdUIKit.init(uiKitAdapter, application.android.context)
+  }
+}
+

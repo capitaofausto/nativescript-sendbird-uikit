@@ -17,25 +17,23 @@ export class SendbirdComponent {
 
   ngOnInit() {
     // this.demoShared = new DemoSharedSendbird();
-    // this.sendbird.init()
+    this.sendbird.init()
   }
 
   start() {
-    // this.sendbird.connect('bento')
+    this.sendbird.connect('bento')
   }
 
   createChannel() {
-    /* this.sendbird.createChannel().then(res => {
+    this.sendbird.createChannel().then(res => {
       this.channelUrl = res.data
-    }) */
+      console.log('CHANNEL', this.channelUrl);
+    })
   }
 
   enterChannel() {
-    this.sendbird.enterChannel(this.channelUrl).then(res => {
-      console.log('ENTERED CHANNEL')
-      this.sendbird.receiveMessage().then(res => {
-        console.log('res:', res)
-      })
+    this.sendbird.enterChannel(this.channelUrl).then((res: {data: string}) => {
+      console.log('res:', res.data)
     })
   }
 
@@ -48,5 +46,9 @@ export class SendbirdComponent {
   uiKitInit() {
     this.sendbirdUiKit.init()
   }
+
+  // receiveMessages() {
+  //   this.sendbird.receiveMessages(this.channelUrl);
+  // }
 
 }

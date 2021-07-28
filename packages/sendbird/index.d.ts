@@ -8,6 +8,8 @@ export declare class Sendbird extends SendbirdCommon {
   sendMessage(message: string): Promise<{data: string}, {error: any}> {}
   receiveMessage(): Promise<any> {}
   getChannelByUrl(channelUrl: string): Promise<any> {}
+  receiveMessages(channelUrl: string) {}
+  leaveChannel(channelUrl: string) {}
 }
 
 export declare class SendBirdUIKit extends SendbirdCommon {

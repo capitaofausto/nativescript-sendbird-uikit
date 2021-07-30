@@ -32,6 +32,105 @@
     <style name="AppTheme" parent="AppThemeBase">
     </style>
 
+    <style name="SendBird" parent="AppTheme">
+      <item name="sb_channel_preview_style">@style/Widget.SendBird.ChannelPreview</item>
+      <item name="sb_user_preview_style">@style/Widget.SendBird.UserPreview</item>
+      <item name="sb_member_preview_style">@style/Widget.SendBird.MemberPreview</item>
+      <item name="sb_channel_settings_style">@style/Widget.SendBird.ChannelSettings</item>
+      <!-- <item name="sb_channel_message_list_style">@style/Widget.SendBird.RecyclerView.Message</item> -->
+      <item name="sb_channel_message_list_style">@style/CustomMessageList</item>
+      <item name="sb_message_user_style">@style/Widget.SendBird.Message.User</item>
+      <item name="sb_message_file_style">@style/Widget.SendBird.Message.File</item>
+      <item name="sb_message_admin_style">@style/Widget.SendBird.Message.Admin</item>
+      <item name="sb_message_timeline_style">@style/Widget.SendBird.Message.Timeline</item>
+      <item name="sb_message_input_style">@style/Widget.SendBird.MessageInput</item>
+      <item name="sb_select_channel_type_style">@style/Widget.SendBird.SelectChannelTypeView</item>
+      <item name="sb_appbar_style">@style/Widget.SendBird.AppBar</item>
+      <item name="sb_recycler_view_style">@style/Widget.SendBird.RecyclerView</item>
+      <item name="sb_dialog_view_style">@style/Widget.SendBird.DialogView</item>
+      <item name="sb_status_frame_style">@style/Widget.SendBird.StatusFrame</item>
+      <item name="sb_toast_view_style">@style/Widget.SendBird.ToastView</item>
+      <item name="sb_emoji_reaction_style">@style/Widget.SendBird.Emoji</item>
+      <item name="sb_single_menu_item_style">@style/Widget.SendBird.SingleMenuItemView</item>
+      <item name="sb_user_profile_style">@style/Widget.SendBird.UserProfile</item>
+
+      <!-- OpenChannel -->
+      <item name="sb_open_channel_message_user_style">@style/Widget.SendBird.OpenChannel.Message.User</item>
+      <item name="sb_open_channel_message_file_style">@style/Widget.SendBird.OpenChannel.Message.File</item>
+      <item name="sb_open_channel_message_admin_style">@style/Widget.SendBird.OpenChannel.Message.Admin</item>
+      <item name="sb_open_channel_settings_style">@style/Widget.SendBird.OpenChannel.ChannelSettings</item>
+    </style>
+
+    <!-- <style name="Custom" parent="SendBird">
+      <item name="sb_channel_message_list_style">@style/CustomMessageList</item>
+      <item name="sb_open_channel_message_user_style">@style/CustomUserMessage</item>
+      <item name="sb_open_channel_message_file_style">CustomFileMessage</item>
+      <item name="sb_open_channel_message_admin_style">CustomAdminMessage</item>
+      <item name="sb_message_timeline_style">CustomTimelineMessage</item>
+      <item name="sb_message_input_style">CustomMessageInput</item>
+    </style> -->
+
+    <style name="CustomMessageList" parent="Widget.SendBird.RecyclerView.Message">
+        <item name="sb_pager_recycler_view_use_divide_line">true</item>
+        <item name="sb_message_recyclerview_background">@drawable/splash_screen</item>
+        <item name="sb_message_recyclerview_tooltip_background">@color/error_500</item>
+        <item name="sb_message_recyclerview_tooltip_textappearance">@color/error_500</item>
+    </style>
+
+    <!-- <style name="CustomMessage" parent="Widget.SendBird.OpenChannel.Message">
+        <item name="sb_message_time_text_appearance">@color/error_500</item>
+        <item name="sb_message_sender_name_text_appearance">@color/error_500</item>
+        <item name="sb_message_operator_name_text_appearance">@color/error_500</item>
+    </style>
+
+    <style name="CustomUserMessage" parent="Widget.SendBird.OpenChannel.Message.User">
+        <item name="sb_message_time_text_appearance">@color/error_500</item>
+        <item name="sb_message_sender_name_text_appearance">@color/error_500</item>
+        <item name="sb_message_operator_name_text_appearance">@color/error_500</item>
+        <item name="sb_message_background">@color/error_500</item>
+        <item name="sb_message_text_appearance">@color/error_500</item>
+        <item name="sb_message_ogtag_background">@color/error_500</item>
+        <item name="sb_message_ogtag_title_appearance">@color/error_500</item>
+        <item name="sb_message_ogtag_description_appearance">@color/error_500</item>
+        <item name="sb_message_ogtag_url_appearance">@color/error_500</item>
+        <item name="sb_message_link_text_color">@color/error_500</item>
+        <item name="sb_message_edited_mark_text_appearance">@color/error_500</item>
+    </style> -->
+
+    <!-- <style name="CustomFileMessage" parent="Widget.SendBird.OpenChannel.Message.File">
+        <item name="sb_message_text_appearance"></item>
+        <item name="sb_message_background"></item>
+    </style>
+
+    <style name="CustomAdminMessage" parent="Widget.SendBird.OpenChannel.Message.Admin">
+        <item name="sb_admin_message_text_appearance"></item>
+        <item name="sb_admin_message_background"></item>
+    </style>
+
+    <style name="CustomTimelineMessage" parent="Widget.SendBird.Message.Timeline">
+        <item name="sb_message_timeline_text_appearance"></item>
+        <item name="sb_message_timeline_background"></item>
+    </style>
+
+    <style name="CustomMessageInput" parent="Widget.SendBird.MessageInput">
+        <item name="sb_message_input_background"></item>
+        <item name="sb_message_input_text_background"></item>
+        <item name="sb_message_input_text_appearance"></item>
+        <item name="sb_message_input_text_hint_color"></item>
+        <item name="sb_message_input_text_cursor_drawable"></item>
+        <item name="sb_message_input_enable"></item>
+        <item name="sb_message_input_left_button_tint"></item>
+        <item name="sb_message_input_left_button_background"></item>
+        <item name="sb_message_input_right_button_tint"></item>
+        <item name="sb_message_input_right_button_background"></item>
+        <item name="sb_message_input_edit_save_button_text_appearance"></item>
+        <item name="sb_message_input_edit_save_button_text_color"></item>
+        <item name="sb_message_input_edit_save_button_background"></item>
+        <item name="sb_message_input_edit_cancel_button_text_appearance"></item>
+        <item name="sb_message_input_edit_cancel_button_text_color"></item>
+        <item name="sb_message_input_edit_cancel_button_background"></item>
+    </style> -->
+
     <!-- theme for action-bar -->
     <style name="NativeScriptToolbarStyleBase" parent="Widget.AppCompat.Toolbar">
         <item name="android:background">@color/ns_primary</item>
@@ -42,4 +141,4 @@
 
     <style name="NativeScriptToolbarStyle" parent="NativeScriptToolbarStyleBase">
     </style>
-</resources> 
+</resources>

@@ -1,6 +1,7 @@
 import { SendbirdCommon, APP_ID } from './common';
 import * as application from '@nativescript/core/application';
 import { OpenChannelParams } from './interfaces/channel';
+
 class myConnectHandler extends com.sendbird.android.SendBird.ConnectHandler {
 	constructor(resolve, reject) {
 		super({
@@ -137,7 +138,7 @@ export class Sendbird extends SendbirdCommon {
 	sendMessage(message: string) {
 		return new Promise((resolve, reject) => {
 			const sendMessageHandler = new SendMessage(resolve, reject);
-			this.sendbirdChannel.sendUserMessage(message, sendMessageHandler);
+			// this.sendbirdChannel.sendUserMessage(message, sendMessageHandler);
 		});
 	}
 
@@ -159,47 +160,56 @@ export class Sendbird extends SendbirdCommon {
 }
 
 class UserInfo extends com.sendbird.uikit.interfaces.UserInfo {
-  constructor() {
+  constructor(userId: string, username: string, imageUrl: string) {
     super({
       getNickname() {
-        // TODO Get User Nickname
-        return 'Nickname'
+        return this.username
       },
       getProfileUrl(): string {
-        return ''
+        return this.imageUrl
       },
       getUserId() {
-        // TODO Get User ID
-        return 'ID'
+        return this.userId
       }
     })
   }
 }
 
 class SendBirdUIKitAdapter extends com.sendbird.uikit.adapter.SendBirdUIKitAdapter {
-  constructor() {
+  constructor(appId: string, userId: string, username: string, imageUrl: string) {
     super({
-      getAppId(): string {
-        return APP_ID
-      },
       getAccessToken(): string {
         return ''
       },
+      getAppId(): string {
+        return this.appId
+      },
       getUserInfo(): com.sendbird.uikit.interfaces.UserInfo {
-        return new UserInfo()
+        return new UserInfo(this.userId, this.username, this.imageUrl)
       }
     })
   }
 }
 
-export class SendBirdUIKit extends android.app.Application {
+export class SendBirdUIKit {
+  sendbirdUIKit = com.sendbird.uikit.SendBirdUIKit
+  start(appId: string, userId: string, username: string, imageUrl: string) {
+    var context = application.android.context;
+    this.sendbirdUIKit.init(new SendBirdUIKitAdapter(appId, userId, username, imageUrl), context)
+    var intent = new android.content.Intent(context, (com as any).tns.MainActivity.class);
+    let activity = application.android.foregroundActivity || application.android.startActivity;
+    activity.startActivity(intent);
+  }
 
-  sendBirdUIKit = com.sendbird.uikit.SendBirdUIKit
+  setTheme(style: 'Light' | 'Dark'): void {
+    const theme = this.sendbirdUIKit.ThemeMode[style]
+    this.sendbirdUIKit.setDefaultThemeMode(theme)
+  }
 
-  init() {
-    super.onCreate()
-    const uiKitAdapter = new SendBirdUIKitAdapter()
-    this.sendBirdUIKit.init(uiKitAdapter, application.android.context)
+  customChannelPreview() {
+    // const channelListAdapter = new com.sendbird.uikit.activities.adapter.ChannelListAdapter.ChannelPreviewHolder(new android.view.View(application.android.context))
+    // channelListAdapter.bind()
   }
 }
+
 

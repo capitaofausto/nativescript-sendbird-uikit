@@ -1,9 +1,39 @@
+apply plugin: 'com.android.application'
+
+android {
+    dataBinding {
+        enabled = true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8    // Make sure you have JavaVersion 1.8.
+        targetCompatibility JavaVersion.VERSION_1_8    // Make sure you have JavaVersion 1.8.
+    }
+
+}
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.5.4'
+        // Don't place your application dependencies here.
+        // They belong to the individual module build.gradle files.
+    }
+}
+
 allprojects {
     repositories {
-        maven { url "https://repo.sendbird.com/public/maven" }
+        google()
+        jcenter()
+        maven { url "https://jitpack.io" }  // Add this line.
+        maven { url "https://repo.sendbird.com/public/maven" }  // Add this line.
     }
 }
 
 dependencies {
     implementation 'com.sendbird.sdk:sendbird-android-sdk:3.0.168'
+    implementation 'com.sendbird.sdk:uikit:2.1.5'
 }

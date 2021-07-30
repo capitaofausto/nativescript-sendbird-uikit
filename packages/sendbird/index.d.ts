@@ -12,7 +12,7 @@ export declare class Sendbird extends SendbirdCommon {
   leaveChannel(channelUrl: string) {}
 }
 
-export declare class SendBirdUIKit extends SendbirdCommon {
-  init(): void {}
+export declare class SendbirdUIKit {
+  startUIKit() {};
+  setCurrentUser(userId: string, nickname: string, profileUrl: string);
 }
-

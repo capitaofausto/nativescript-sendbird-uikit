@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Application, Color, isIOS } from '@nativescript/core';
+import { SendbirdService } from './sendbird.service';
 
 @Component({
 	selector: 'demo-app',
@@ -6,5 +8,20 @@ import { Component } from '@angular/core';
 		<page-router-outlet></page-router-outlet>
 	</GridLayout>`,
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+
+  constructor(
+    private sendbirdService: SendbirdService
+  ) {}
+
+  ngOnInit(): void {
+    /* if (isIOS) {
+      Application.on('launch', _ => {
+        console.log('AQUIIII');
+
+      });
+    } */
+    this.sendbirdService.init();
+    this.sendbirdService.setCurrentUser('faustino', 'faustino', 'faustino');
+  }
 }

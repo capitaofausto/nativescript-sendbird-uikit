@@ -1,6 +1,6 @@
 import { Component, NgZone } from '@angular/core';
-// import { DemoSharedSendbird } from '@demo/shared';
-import { Sendbird, SendBirdUIKit } from '@nativescript/sendbird';
+import { Page } from '@nativescript/core';
+import { SendbirdService } from '../sendbird.service';
 
 @Component({
 	selector: 'demo-sendbird',
@@ -8,43 +8,46 @@ import { Sendbird, SendBirdUIKit } from '@nativescript/sendbird';
 })
 export class SendbirdComponent {
 
-  // demoShared: DemoSharedSendbird;
-  sendbird = new Sendbird()
-  sendbirdUiKit = new SendBirdUIKit()
   private channelUrl: string
 
-	constructor(private _ngZone: NgZone) {}
+	constructor(
+    private _ngZone: NgZone,
+    private sendbirdService: SendbirdService,
+    private _page: Page
+  ) {}
 
   ngOnInit() {
     // this.demoShared = new DemoSharedSendbird();
-    this.sendbird.init()
+    this._page.on(Page.loadedEvent, () => {
+      this.sendbirdService.startUIKit();
+    })
   }
 
   start() {
-    this.sendbird.connect('bento')
+    this.sendbirdService.connect('bento');
   }
 
   createChannel() {
-    this.sendbird.createChannel().then(res => {
+    this.sendbirdService.createChannel().subscribe(res => {
       this.channelUrl = res.data
       console.log('CHANNEL', this.channelUrl);
     })
   }
 
   enterChannel() {
-    this.sendbird.enterChannel(this.channelUrl).then((res: {data: string}) => {
+    this.sendbirdService.enterChannel(this.channelUrl).subscribe((res: {data: string}) => {
       console.log('res:', res.data)
     })
   }
 
   sendMessage() {
-    this.sendbird.sendMessage('Hello from app').then(res => {
-      // console.log('res:', res.data)
+    this.sendbirdService.sendMessage('Hello from app').subscribe((res: {data: string}) => {
+      console.log('res:', res.data)
     })
   }
 
-  uiKitInit() {
-    this.sendbirdUiKit.init()
+  receiveMessages() {
+    this.sendbirdService.receiveMessages(this.channelUrl);
   }
 
   // receiveMessages() {

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Sendbird, SendbirdUIKit } from '@nativescript/sendbird';
+import { Sendbird, SendbirdUIKit} from '@nativescript/sendbird';
 import { from } from 'rxjs';
 
 
@@ -23,8 +23,8 @@ export class SendbirdService {
     this.sendbirdUIKit.setCurrentUser(user, nickname, profileUrl);
   }
 
-  startUIKit() {
-    this.sendbirdUIKit.startUIKit();
+  startUIKit(user: string, nickname: string, profileUrl: string) {
+    this.sendbirdUIKit.start('1B1FEC58-BDF5-499E-832A-5C06E86EAD9C', user, nickname, profileUrl);
   }
 
   createChannel() {

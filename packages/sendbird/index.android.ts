@@ -163,13 +163,13 @@ class UserInfo extends com.sendbird.uikit.interfaces.UserInfo {
   constructor(userId: string, username: string, imageUrl: string) {
     super({
       getNickname() {
-        return this.username
+        return username
       },
       getProfileUrl(): string {
-        return this.imageUrl
+        return imageUrl
       },
       getUserId() {
-        return this.userId
+        return userId
       }
     })
   }
@@ -182,20 +182,20 @@ class SendBirdUIKitAdapter extends com.sendbird.uikit.adapter.SendBirdUIKitAdapt
         return ''
       },
       getAppId(): string {
-        return this.appId
+        return appId;
       },
       getUserInfo(): com.sendbird.uikit.interfaces.UserInfo {
-        return new UserInfo(this.userId, this.username, this.imageUrl)
+        return new UserInfo(userId, username, imageUrl);
       }
     })
   }
 }
 
-export class SendBirdUIKit {
-  sendbirdUIKit = com.sendbird.uikit.SendBirdUIKit
+export class SendbirdUIKit {
+  sendbirdUIKit = com.sendbird.uikit.SendBirdUIKit;
   start(appId: string, userId: string, username: string, imageUrl: string) {
     var context = application.android.context;
-    this.sendbirdUIKit.init(new SendBirdUIKitAdapter(appId, userId, username, imageUrl), context)
+    this.sendbirdUIKit.init(new SendBirdUIKitAdapter(appId, userId, username, imageUrl), context);
     var intent = new android.content.Intent(context, (com as any).tns.MainActivity.class);
     let activity = application.android.foregroundActivity || application.android.startActivity;
     activity.startActivity(intent);

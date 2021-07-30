@@ -12,8 +12,8 @@ export declare class Sendbird extends SendbirdCommon {
   leaveChannel(channelUrl: string) {}
 }
 
-export declare class SendBirdUIKit {
-  start(appId: string, userId: stirng, username: string, imageUrl: string): void {}
+export declare class SendbirdUIKit {
+  start(appId: string, userId: string, username: string, imageUrl: string): void {}
   setCurrentUser(userId: string, nickname: string, profileUrl: string);
   setTheme(style: 'Light' | 'Dark'): void {}
 }

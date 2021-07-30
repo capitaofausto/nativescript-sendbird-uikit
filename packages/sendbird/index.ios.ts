@@ -93,8 +93,10 @@ export class SendbirdUIKit {
     SBUGlobals.CurrentUser = new SBUUser({userId, nickname, profileUrl });
   }
 
-  startUIKit() {
+  start(appId: string, userId: string, nickname: string, profileUrl: string) {
     console.log("UI KIT start IOS");
+    SBDMain.initWithApplicationId(appId);
+    this.setCurrentUser(userId, nickname, profileUrl);
     let topMostFrame = Frame.topmost();
     let viewController: UIViewController = topMostFrame.currentPage && topMostFrame.currentPage.ios;
     /* let channelTheme = new SBUChannelTheme({navigationBarTintColor: SBUColorSet.primary300});

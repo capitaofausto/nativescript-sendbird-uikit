@@ -18,9 +18,10 @@ export class SendbirdComponent {
 
   ngOnInit() {
     // this.demoShared = new DemoSharedSendbird();
-    this._page.on(Page.loadedEvent, () => {
+    /* this._page.on(Page.loadedEvent, () => {
       this.sendbirdService.startUIKit();
-    })
+    }) */
+    this.sendbirdService.startUIKit('faustino', 'faustino', 'faustino');
   }
 
   start() {
@@ -29,8 +30,8 @@ export class SendbirdComponent {
 
   createChannel() {
     this.sendbirdService.createChannel().subscribe(res => {
-      this.channelUrl = res.data
-      console.log('CHANNEL', this.channelUrl);
+      /* this.channelUrl = res.data
+      console.log('CHANNEL', this.channelUrl); */
     })
   }
 

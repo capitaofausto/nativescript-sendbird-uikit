@@ -1,4 +1,4 @@
-import { Component, NgZone } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone } from '@angular/core';
 import { Page } from '@nativescript/core';
 import { SendbirdService } from '../sendbird.service';
 
@@ -8,24 +8,33 @@ import { SendbirdService } from '../sendbird.service';
 })
 export class SendbirdComponent {
 
-  private channelUrl: string
+  public unreadCount: any;
+  private channelUrl: string;
 
 	constructor(
     private _ngZone: NgZone,
     private sendbirdService: SendbirdService,
+    private cdr: ChangeDetectorRef,
     private _page: Page
   ) {}
 
   ngOnInit() {
     // this.demoShared = new DemoSharedSendbird();
     /* this._page.on(Page.loadedEvent, () => {
-      this.sendbirdService.startUIKit();
     }) */
-    this.sendbirdService.startUIKit('faustino', 'faustino', 'faustino');
+    this.sendbirdService.startUIKit();
+    setTimeout(() => {
+      this.sendbirdService.getTotalUnreadMessages().subscribe((res: any) => {
+        console.log('SO PARA VER', res);
+        this.unreadCount = res.data;
+        this.cdr.detectChanges();
+      })
+    }, 500)
+
   }
 
   start() {
-    this.sendbirdService.connect('bento');
+    /* this.sendbirdService.connect('bento'); */
   }
 
   createChannel() {

@@ -90,12 +90,26 @@ class ChannelByUrl extends com.sendbird.android.OpenChannel.OpenChannelGetHandle
 	}
 }
 
+class GroupChannelTotalUnreadMessageCount extends com.sendbird.android.GroupChannel.GroupChannelTotalUnreadMessageCountHandler {
+  constructor(resolve, reject) {
+    super({
+      onResult(count, error) {
+        if (error != null) {
+					return reject({ error });
+				}
+				return resolve({ data: count });
+      }
+    })
+  }
+}
+
 export class Sendbird extends SendbirdCommon {
 	private sendbird = com.sendbird.android.SendBird;
 	private sendbirdChannel: com.sendbird.android.OpenChannel;
 
-	init() {
-		this.sendbird.init(APP_ID, application.android.context);
+	init(appId: string, userId: string, username: string, imageUrl: string) {
+		this.sendbird.init(appId, application.android.context);
+    this.sendbird.updateCurrentUserInfo(userId, username, null);
 	}
 
 	connect(userId: string) {
@@ -157,6 +171,12 @@ export class Sendbird extends SendbirdCommon {
 			com.sendbird.android.OpenChannel.getChannel(channelUrl, channelHandler);
 		});
 	}
+
+  getTotalUnreadMessages() {
+    return new Promise((resolve, reject) => {
+      this.sendbird.getTotalUnreadMessageCount(new GroupChannelTotalUnreadMessageCount(resolve, reject));
+    })
+  }
 }
 
 class UserInfo extends com.sendbird.uikit.interfaces.UserInfo {
@@ -193,9 +213,17 @@ class SendBirdUIKitAdapter extends com.sendbird.uikit.adapter.SendBirdUIKitAdapt
 
 export class SendbirdUIKit {
   sendbirdUIKit = com.sendbird.uikit.SendBirdUIKit;
-  start(appId: string, userId: string, username: string, imageUrl: string) {
+  init(appId: string, userId: string, username: string, imageUrl: string) {
     var context = application.android.context;
     this.sendbirdUIKit.init(new SendBirdUIKitAdapter(appId, userId, username, imageUrl), context);
+    // var context = application.android.context;
+    var intent = new android.content.Intent(context, (com as any).tns.MainActivity.class);
+    let activity = application.android.foregroundActivity || application.android.startActivity;
+    activity.startActivity(intent);
+  }
+
+  launch() {
+    var context = application.android.context;
     var intent = new android.content.Intent(context, (com as any).tns.MainActivity.class);
     let activity = application.android.foregroundActivity || application.android.startActivity;
     activity.startActivity(intent);

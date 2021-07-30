@@ -6,10 +6,6 @@ export class Sendbird extends SendbirdCommon {
   sendbirdChannel: SBDOpenChannel;
   delegate: OpenChannelChattingViewController;
 
-  init() {
-		SBDMain.initWithApplicationId(APP_ID);
-	}
-
   connect(userId: string): Promise<{data: SBDUser}> {
     return new Promise((resolve, reject) => {
       SBDMain.connectWithUserIdCompletionHandler(userId, (user, error) => {
@@ -84,6 +80,20 @@ export class Sendbird extends SendbirdCommon {
   leaveChannel(channelUrl: string) {
     SBDMain.removeChannelDelegateForIdentifier(channelUrl);
   }
+
+  getTotalUnreadMessages() {
+    return new Promise((resolve, reject) => {
+      SBDMain.getTotalUnreadMessageCountWithCompletionHandler(( totalCount, error) => {
+        if(error) {
+          console.log('updateUnreadCount Error');
+          reject({ error });
+        }
+        console.log('TOTAL COUNT', totalCount);
+
+        resolve({ data: totalCount })
+      })
+    })
+  }
 }
 
 export class SendbirdUIKit {
@@ -93,10 +103,13 @@ export class SendbirdUIKit {
     SBUGlobals.CurrentUser = new SBUUser({userId, nickname, profileUrl });
   }
 
-  start(appId: string, userId: string, nickname: string, profileUrl: string) {
+  init(appId: string, userId: string, nickname: string, profileUrl: string) {
     console.log("UI KIT start IOS");
     SBDMain.initWithApplicationId(appId);
     this.setCurrentUser(userId, nickname, profileUrl);
+  }
+
+  launch() {
     const app = UIApplication.sharedApplication;
     const win = app.keyWindow || (app.windows && app.windows.count > 0 && app.windows.objectAtIndex(0));
     let viewController = win.rootViewController;

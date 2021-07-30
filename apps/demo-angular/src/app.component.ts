@@ -21,7 +21,7 @@ export class AppComponent implements OnInit {
 
       });
     } */
-
+    this.sendbirdService.init('faustino', 'faustino', 'faustino');
     // this.sendbirdService.setCurrentUser();
   }
 }

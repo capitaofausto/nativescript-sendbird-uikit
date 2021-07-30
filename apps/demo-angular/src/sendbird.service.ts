@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { isIOS } from '@nativescript/core';
 import { Sendbird, SendbirdUIKit} from '@nativescript/sendbird';
 import { from } from 'rxjs';
 
@@ -11,8 +12,12 @@ export class SendbirdService {
   sendbird = new Sendbird();
   sendbirdUIKit = new SendbirdUIKit();
 
-  init() {
-    this.sendbird.init();
+  init(user: string, nickname: string, profileUrl: string) {
+    if(isIOS) {
+      this.sendbirdUIKit.init('1B1FEC58-BDF5-499E-832A-5C06E86EAD9C', user, nickname, profileUrl);
+    } else {
+      this.sendbird.init('1B1FEC58-BDF5-499E-832A-5C06E86EAD9C', user, nickname, profileUrl);
+    }
   }
 
   connect(user: string) {
@@ -23,8 +28,12 @@ export class SendbirdService {
     this.sendbirdUIKit.setCurrentUser(user, nickname, profileUrl);
   }
 
-  startUIKit(user: string, nickname: string, profileUrl: string) {
-    this.sendbirdUIKit.start('1B1FEC58-BDF5-499E-832A-5C06E86EAD9C', user, nickname, profileUrl);
+  startUIKit() {
+    this.sendbirdUIKit.launch();
+  }
+
+  getTotalUnreadMessages() {
+    return from(this.sendbird.getTotalUnreadMessages());
   }
 
   createChannel() {

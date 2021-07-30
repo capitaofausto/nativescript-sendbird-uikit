@@ -1,6 +1,6 @@
 import { Component, NgZone } from '@angular/core';
 // import { DemoSharedSendbird } from '@demo/shared';
-// import { Sendbird } from '@nativescript/sendbird';
+import { Sendbird, SendBirdUIKit } from '@nativescript/sendbird';
 
 @Component({
 	selector: 'demo-sendbird',
@@ -9,7 +9,8 @@ import { Component, NgZone } from '@angular/core';
 export class SendbirdComponent {
 
   // demoShared: DemoSharedSendbird;
-  // sendbird = new Sendbird()
+  sendbird = new Sendbird()
+  sendbirdUiKit = new SendBirdUIKit()
   private channelUrl: string
 
 	constructor(private _ngZone: NgZone) {}
@@ -41,4 +42,12 @@ export class SendbirdComponent {
     }) */
   }
 
+  startUiKit() {
+    const appId = '1B1FEC58-BDF5-499E-832A-5C06E86EAD9C'
+    this.sendbirdUiKit.start(appId, '123', 'joao', '')
+  }
+
+  changeTheme() {
+    this.sendbirdUiKit.setTheme('Dark')
+  }
 }

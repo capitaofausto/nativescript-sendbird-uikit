@@ -7,3 +7,8 @@ export declare class Sendbird extends SendbirdCommon {
   enterChannel(channelId: string): Promise<{data: string} | {error: any}> {}
   sendMessage(message: string): Promise<{data: string} | {error: any}> {}
 }
+
+export declare class SendBirdUIKit {
+  start(appId: string, userId: stirng, username: string, imageUrl: string): void {}
+  setTheme(style: 'Light' | 'Dark'): void {}
+}

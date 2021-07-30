@@ -1,6 +1,7 @@
 import { SendbirdCommon, APP_ID } from './common';
 import * as application from '@nativescript/core/application';
 import { OpenChannelParams } from './interfaces/channel';
+
 class myConnectHandler extends com.sendbird.android.SendBird.ConnectHandler {
 	constructor(resolve, reject) {
 		super({
@@ -119,7 +120,62 @@ export class Sendbird extends SendbirdCommon {
 	sendMessage(message: string) {
 		return new Promise((resolve, reject) => {
 			const sendMessageHandler = new SendMessage(resolve, reject);
-			this.sendbirdChannel.sendUserMessage(message, sendMessageHandler);
+			// this.sendbirdChannel.sendUserMessage(message, sendMessageHandler);
 		});
 	}
 }
+
+class UserInfo extends com.sendbird.uikit.interfaces.UserInfo {
+  constructor(userId: string, username: string, imageUrl: string) {
+    super({
+      getNickname(): string {
+        return this.username
+      },
+      getProfileUrl(): string {
+        return this.imageUrl
+      },
+      getUserId(): string {
+        return this.userId
+      }
+    })
+  }
+}
+
+class SendBirdUIKitAdapter extends com.sendbird.uikit.adapter.SendBirdUIKitAdapter {
+  constructor(appId: string, userId: string, username: string, imageUrl: string) {
+    super({
+      getAccessToken(): string {
+        return ''
+      },
+      getAppId(): string {
+        return this.appId
+      },
+      getUserInfo(): com.sendbird.uikit.interfaces.UserInfo {
+        return new UserInfo(this.userId, this.username, this.imageUrl)
+      }
+    })
+  }
+}
+
+export class SendBirdUIKit {
+  sendbirdUIKit = com.sendbird.uikit.SendBirdUIKit
+  start(appId: string, userId: string, username: string, imageUrl: string) {
+    var context = application.android.context;
+    this.sendbirdUIKit.init(new SendBirdUIKitAdapter(appId, userId, username, imageUrl), context)
+    var intent = new android.content.Intent(context, (com as any).tns.MainActivity.class);
+    let activity = application.android.foregroundActivity || application.android.startActivity;
+    activity.startActivity(intent);
+  }
+
+  setTheme(style: 'Light' | 'Dark'): void {
+    const theme = this.sendbirdUIKit.ThemeMode[style]
+    this.sendbirdUIKit.setDefaultThemeMode(theme)
+  }
+
+  customChannelPreview() {
+    // const channelListAdapter = new com.sendbird.uikit.activities.adapter.ChannelListAdapter.ChannelPreviewHolder(new android.view.View(application.android.context))
+    // channelListAdapter.bind()
+  }
+}
+
+

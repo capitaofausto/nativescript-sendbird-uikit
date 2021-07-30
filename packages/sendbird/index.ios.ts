@@ -22,7 +22,6 @@ export class Sendbird extends SendbirdCommon {
         // The user is connected to Sendbird server.
       })
     })
-
   }
 
   createChannel(): Promise<{data: string}> {
@@ -70,7 +69,6 @@ export class Sendbird extends SendbirdCommon {
         // The current user can receive messages from other users through the didReceiveMessage() method of an event delegate.
       })
     })
-
   }
 
   receiveMessages(channelUrl: string) {
@@ -85,6 +83,48 @@ export class Sendbird extends SendbirdCommon {
 
   leaveChannel(channelUrl: string) {
     SBDMain.removeChannelDelegateForIdentifier(channelUrl);
+  }
+}
+
+export class SendbirdUIKit {
+  delegateUi: ChannelListViewController;
+
+  setCurrentUser(userId: string, nickname: string, profileUrl: string) {
+    SBUGlobals.CurrentUser = new SBUUser({userId, nickname, profileUrl });
+  }
+
+  startUIKit() {
+    console.log("UI KIT start IOS");
+    let topMostFrame = Frame.topmost();
+    let viewController: UIViewController = topMostFrame.currentPage && topMostFrame.currentPage.ios;
+    /* let channelTheme = new SBUChannelTheme({navigationBarTintColor: SBUColorSet.primary300});
+
+    let messageCellTheme = SBUMessageCellTheme(
+        backgroundColor: SBUColorSet.background100
+        ...
+    )
+
+    let messageInputTheme = SBUMessageInputTheme(
+        backgroundColor: SBUColorSet.background100
+        ...
+    )
+
+    SBUTheme.setChannel(channelTheme: channelTheme,
+            messageCellTheme: messageCellTheme,
+            messageInputTheme: messageInputTheme) */
+    // Channel theme.
+    SBUTheme.channelTheme.backgroundColor = SBUColorSet.background100;
+
+    // Message cell theme.
+    SBUTheme.messageCellTheme.backgroundColor = SBUColorSet.background100;
+
+    // Message input theme.
+    SBUTheme.messageInputTheme.backgroundColor = SBUColorSet.background100;
+
+    this.delegateUi = ChannelListViewController.initWithOwner(this);
+    this.delegateUi._owner = new WeakRef(this);
+    let naviVC = new UINavigationController({rootViewController: this.delegateUi });
+    viewController.presentViewControllerAnimatedCompletion(naviVC, true, () => {console.log('COMPLETIONNNN')});
   }
 }
 
@@ -121,4 +161,31 @@ class OpenChannelChattingViewController extends UIViewController implements SBDC
     console.log('ARRIVED MESSAGE', message);
   }
 
+}
+
+@NativeClass()
+class ChannelListViewController extends SBUChannelListViewController {
+
+  public static ObjCExposedMethods = {
+    viewDidLoad: { returns: interop.types.void, params: [] },
+	};
+
+  _owner: WeakRef<any>;
+	// agoraKit: AgoraRtcEngineKit;
+
+	static new(): ChannelListViewController {
+		return <ChannelListViewController>super.new(); // calls new() on the NSObject
+	}
+
+	public static initWithOwner(owner: any): ChannelListViewController {
+		let delegate = <ChannelListViewController>super.new();
+		delegate._owner = new WeakRef(owner);
+		return delegate;
+	}
+
+  viewDidLoad() {
+		console.log('VIEW DID LOAD');
+		super.viewDidLoad();
+
+	}
 }

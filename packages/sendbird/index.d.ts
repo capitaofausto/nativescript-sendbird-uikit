@@ -9,3 +9,8 @@ export declare class Sendbird extends SendbirdCommon {
   receiveMessages(channelUrl: string) {}
   leaveChannel(channelUrl: string) {}
 }
+
+export declare class SendbirdUIKit {
+  startUIKit() {};
+  setCurrentUser(userId: string, nickname: string, profileUrl: string);
+}

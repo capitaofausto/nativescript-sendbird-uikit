@@ -1,5 +1,5 @@
 import { SendbirdCommon, APP_ID } from './common';
-import { Device, File, Frame, ImageSource, knownFolders, path, Dialogs } from '@nativescript/core';
+import { Utils, Frame } from '@nativescript/core';
 
 export class Sendbird extends SendbirdCommon {
 
@@ -97,8 +97,9 @@ export class SendbirdUIKit {
     console.log("UI KIT start IOS");
     SBDMain.initWithApplicationId(appId);
     this.setCurrentUser(userId, nickname, profileUrl);
-    let topMostFrame = Frame.topmost();
-    let viewController: UIViewController = topMostFrame.currentPage && topMostFrame.currentPage.ios;
+    const app = UIApplication.sharedApplication;
+    const win = app.keyWindow || (app.windows && app.windows.count > 0 && app.windows.objectAtIndex(0));
+    let viewController = win.rootViewController;
     /* let channelTheme = new SBUChannelTheme({navigationBarTintColor: SBUColorSet.primary300});
 
     let messageCellTheme = SBUMessageCellTheme(
@@ -126,7 +127,7 @@ export class SendbirdUIKit {
     this.delegateUi = ChannelListViewController.initWithOwner(this);
     this.delegateUi._owner = new WeakRef(this);
     let naviVC = new UINavigationController({rootViewController: this.delegateUi });
-    viewController.presentViewControllerAnimatedCompletion(naviVC, true, () => {console.log('COMPLETIONNNN')});
+    Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(naviVC, true, () => { console.log('COMPLETIONNNN'); });
   }
 }
 

@@ -1,7 +1,7 @@
 {
-  "name": "@nativescript/sendbird",
+  "name": "@jbento/nativescript-sendbird",
   "version": "1.0.0",
-  "description": "Add a plugin description",
+  "description": "Integration of native Sendbird sdk and UiKit for Nativescript",
   "main": "index",
   "typings": "index.d.ts",
   "nativescript": {
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/NativeScript/plugins.git"
+    "url": "https://github.com/capitaofausto/nativescript-sendbird-uikit"
   },
   "keywords": [
     "NativeScript",
@@ -22,14 +22,14 @@
     "Android"
   ],
   "author": {
-    "name": "NativeScript",
-    "email": "oss@nativescript.org"
+    "name": "João Bento",
+    "email": "jpmbento95@gmail.com"
   },
   "bugs": {
-    "url": "https://github.com/NativeScript/plugins/issues"
+    "url": "https://github.com/capitaofausto/nativescript-sendbird-uikit/issues"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/NativeScript/plugins",
+  "homepage": "https://github.com/capitaofausto/nativescript-sendbird-uikit",
   "readmeFilename": "README.md",
   "bootstrapper": "@nativescript/plugin-seed"
 }

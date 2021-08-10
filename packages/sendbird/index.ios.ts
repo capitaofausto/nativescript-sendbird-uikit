@@ -94,6 +94,18 @@ export class Sendbird extends SendbirdCommon {
       })
     })
   }
+
+  registerPushToken(token: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      SBDMain.registerDevicePushKitTokenUniqueCompletionHandler(new NSString({ string: token }).dataUsingEncoding(NSUTF8StringEncoding), true, (status, error) => {
+        if (error) {
+          console.error('Failed to register device token: ' + error);
+          reject(error)
+        }
+        resolve();
+      });
+    });
+  }
 }
 
 export class SendbirdUIKit {

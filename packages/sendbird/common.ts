@@ -6,4 +6,8 @@ export interface dismissCallback {
   (): void;
 }
 export class SendbirdCommon extends Observable {
+
+  registerPushToken(token: string): Promise<void> {
+    return Promise.reject('Not implemented');
+  }
 }

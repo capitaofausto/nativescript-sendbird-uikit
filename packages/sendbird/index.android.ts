@@ -103,6 +103,20 @@ class GroupChannelTotalUnreadMessageCount extends com.sendbird.android.GroupChan
   }
 }
 
+class RegisterPushTokenHandler extends com.sendbird.android.SendBird.RegisterPushTokenWithStatusHandler {
+  constructor(resolve, reject) {
+    super({
+      onRegistered: (status, exception) => {
+        if (exception) {
+          console.error('Failed to register device token: ' + exception);
+          reject(exception);
+        }
+        resolve();
+      }
+    })
+  }
+}
+
 export class Sendbird extends SendbirdCommon {
 	private sendbird = com.sendbird.android.SendBird;
 	private sendbirdChannel: com.sendbird.android.OpenChannel;
@@ -176,6 +190,12 @@ export class Sendbird extends SendbirdCommon {
     return new Promise((resolve, reject) => {
       this.sendbird.getTotalUnreadMessageCount(new GroupChannelTotalUnreadMessageCount(resolve, reject));
     })
+  }
+
+  registerPushToken(token: string): Promise<void> {
+	  return new Promise((resolve, reject) => {
+      this.sendbird.registerPushTokenForCurrentUser(token, true, new RegisterPushTokenHandler(resolve, reject));
+    });
   }
 }
 

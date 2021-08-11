@@ -216,10 +216,9 @@ export class SendbirdUIKit {
   init(appId: string, userId: string, username: string, imageUrl: string) {
     var context = application.android.context;
     this.sendbirdUIKit.init(new SendBirdUIKitAdapter(appId, userId, username, imageUrl), context);
-    // var context = application.android.context;
-    var intent = new android.content.Intent(context, (com as any).tns.MainActivity.class);
-    let activity = application.android.foregroundActivity || application.android.startActivity;
-    activity.startActivity(intent);
+    // var intent = new android.content.Intent(context, (com as any).tns.MainActivity.class);
+    // let activity = application.android.foregroundActivity || application.android.startActivity;
+    // activity.startActivity(intent);
   }
 
   launch() {

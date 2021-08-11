@@ -1,4 +1,4 @@
-import { SendbirdCommon, APP_ID } from './common';
+import { SendbirdCommon, APP_ID, dismissCallback } from './common';
 import { Utils, Frame } from '@nativescript/core';
 
 export class Sendbird extends SendbirdCommon {
@@ -109,7 +109,7 @@ export class SendbirdUIKit {
     this.setCurrentUser(userId, nickname, profileUrl);
   }
 
-  launch() {
+  launch(callback: dismissCallback) {
     const app = UIApplication.sharedApplication;
     const win = app.keyWindow || (app.windows && app.windows.count > 0 && app.windows.objectAtIndex(0));
     let viewController = win.rootViewController;
@@ -127,7 +127,7 @@ export class SendbirdUIKit {
 
     SBUTheme.setChannel(channelTheme: channelTheme,
             messageCellTheme: messageCellTheme,
-            messageInputTheme: messageInputTheme) */
+            messageInputTheme: messageInputTheme)
     // Channel theme.
     SBUTheme.channelTheme.backgroundColor = SBUColorSet.background100;
 
@@ -135,10 +135,11 @@ export class SendbirdUIKit {
     SBUTheme.messageCellTheme.backgroundColor = SBUColorSet.background100;
 
     // Message input theme.
-    SBUTheme.messageInputTheme.backgroundColor = SBUColorSet.background100;
+    SBUTheme.messageInputTheme.backgroundColor = SBUColorSet.background100; */
 
-    this.delegateUi = ChannelListViewController.initWithOwner(this);
+    this.delegateUi = new ChannelListViewController(callback);
     this.delegateUi._owner = new WeakRef(this);
+    // this.delegateUi.modalPresentationStyle = UIModalPresentationStyle.OverCurrentContext;
     let naviVC = new UINavigationController({rootViewController: this.delegateUi });
     Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(naviVC, true, () => { console.log('COMPLETIONNNN'); });
   }
@@ -187,7 +188,12 @@ class ChannelListViewController extends SBUChannelListViewController {
 	};
 
   _owner: WeakRef<any>;
-	// agoraKit: AgoraRtcEngineKit;
+  dismissCallback: dismissCallback;
+
+  constructor(dismissCalback: dismissCallback) {
+    super({channelListQuery: null})
+    this.dismissCallback = dismissCalback;
+  }
 
 	static new(): ChannelListViewController {
 		return <ChannelListViewController>super.new(); // calls new() on the NSObject
@@ -204,4 +210,10 @@ class ChannelListViewController extends SBUChannelListViewController {
 		super.viewDidLoad();
 
 	}
+
+  viewWillDisappear() {
+    console.log('VIEW WILLL DISAPPEAR');
+		super.viewWillDisappear(true);
+    this.dismissCallback();
+  }
 }

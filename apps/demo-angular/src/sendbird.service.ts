@@ -16,7 +16,7 @@ export class SendbirdService {
     if(isIOS) {
       this.sendbirdUIKit.init('1B1FEC58-BDF5-499E-832A-5C06E86EAD9C', user, nickname, profileUrl);
     } else {
-      this.sendbird.init('1B1FEC58-BDF5-499E-832A-5C06E86EAD9C', user, nickname, profileUrl);
+      this.sendbirdUIKit.init('1B1FEC58-BDF5-499E-832A-5C06E86EAD9C', user, nickname, profileUrl);
     }
   }
 
@@ -29,7 +29,8 @@ export class SendbirdService {
   }
 
   startUIKit() {
-    this.sendbirdUIKit.launch();
+    this.sendbirdUIKit.launch(() => {console.log('AQUIII na callback do dismiss');
+    });
   }
 
   getTotalUnreadMessages() {

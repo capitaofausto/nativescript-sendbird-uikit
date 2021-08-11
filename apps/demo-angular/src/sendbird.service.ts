@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { isIOS } from '@nativescript/core';
-import { Sendbird, SendbirdUIKit} from '@nativescript/sendbird';
+import { Sendbird, SendbirdUIKit} from '@jbento/nativescript-sendbird';
 import { from } from 'rxjs';
 
 
@@ -29,7 +29,8 @@ export class SendbirdService {
   }
 
   startUIKit() {
-    this.sendbirdUIKit.launch();
+    // this.sendbirdUIKit.launch();
+    this.sendbirdUIKit.launchTabs();
   }
 
   getTotalUnreadMessages() {

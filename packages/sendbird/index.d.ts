@@ -18,4 +18,5 @@ export declare class SendbirdUIKit {
   launch(): void {}
   setCurrentUser(userId: string, nickname: string, profileUrl: string);
   setTheme(style: 'Light' | 'Dark'): void {}
+  launchTabs(): void {}
 }

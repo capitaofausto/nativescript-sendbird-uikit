@@ -151,8 +151,8 @@ export class SendbirdUIKit {
 
     this.delegateUi = new ChannelListViewController(callback);
     this.delegateUi._owner = new WeakRef(this);
-    // this.delegateUi.modalPresentationStyle = UIModalPresentationStyle.OverCurrentContext;
-    let naviVC = new UINavigationController({rootViewController: this.delegateUi });
+    let naviVC = new UINavigationController({ rootViewController: this.delegateUi });
+    naviVC.modalPresentationStyle = UIModalPresentationStyle.FullScreen;
     Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(naviVC, true, () => { console.log('COMPLETIONNNN'); });
   }
 }

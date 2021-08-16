@@ -38,4 +38,5 @@
   <color name="ondark_03">#61ffffff</color>
   <color name="ondark_04">#1effffff</color>
   <color name="information">#adc9ff</color>
+  <color name="header">#f7f5ff</color>
 </resources>

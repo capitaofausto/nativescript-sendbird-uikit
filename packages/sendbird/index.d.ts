@@ -4,7 +4,7 @@ export interface dismissCallback {
 }
 export declare class Sendbird extends SendbirdCommon {
   init(appId: string, userId: string, nickname: string, profileUrl: string) {}
-  connect(userId: string): Promise<{data: com.sendbird.android.User}> {}
+  connect(userId: string, nickname: string, profileUrl: string): Promise<{data: com.sendbird.android.User}> {}
   createChannel(): Promise<{data: string}, {error: any}> {}
   enterChannel(channelId: string): Promise<{data: string}, {error: any}> {}
   sendMessage(message: string): Promise<{data: string}, {error: any}> {}

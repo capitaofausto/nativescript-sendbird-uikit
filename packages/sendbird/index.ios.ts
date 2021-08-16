@@ -6,16 +6,21 @@ export class Sendbird extends SendbirdCommon {
   sendbirdChannel: SBDOpenChannel;
   delegate: OpenChannelChattingViewController;
 
-  connect(userId: string): Promise<{data: SBDUser}> {
+  connect(userId: string, nickname: string, profileUrl: string): Promise<{data: SBDUser}> {
     return new Promise((resolve, reject) => {
       SBDMain.connectWithUserIdCompletionHandler(userId, (user, error) => {
             // Handle error.
             if(error) {
               reject(error)
             }
-            console.log('User is connected');
-            resolve({data: user})
-        // The user is connected to Sendbird server.
+            console.log('User is connected', user.nickname);
+            SBDMain.updateCurrentUserInfoWithNicknameProfileUrlCompletionHandler(nickname, profileUrl, (error) => {
+
+              resolve({ data: user });
+              // The current user's profile is successfully updated.
+              // You could redraw the profile in a view in response to this operation.
+            })
+            // The user is connected to Sendbird server.
       })
     })
   }
@@ -125,9 +130,9 @@ export class SendbirdUIKit {
     const app = UIApplication.sharedApplication;
     const win = app.keyWindow || (app.windows && app.windows.count > 0 && app.windows.objectAtIndex(0));
     let viewController = win.rootViewController;
-    /* let channelTheme = new SBUChannelTheme({navigationBarTintColor: SBUColorSet.primary300});
+    // let channelTheme = new SBUChannelTheme({navigationBarTintColor: SBUColorSet.primary300});
 
-    let messageCellTheme = SBUMessageCellTheme(
+    /* let messageCellTheme = SBUMessageCellTheme(
         backgroundColor: SBUColorSet.background100
         ...
     )
@@ -139,16 +144,23 @@ export class SendbirdUIKit {
 
     SBUTheme.setChannel(channelTheme: channelTheme,
             messageCellTheme: messageCellTheme,
-            messageInputTheme: messageInputTheme)
+            messageInputTheme: messageInputTheme) */
     // Channel theme.
-    SBUTheme.channelTheme.backgroundColor = SBUColorSet.background100;
+    /*  SBUTheme.channelTheme.backgroundColor = SBUColorSet.background100;
 
     // Message cell theme.
     SBUTheme.messageCellTheme.backgroundColor = SBUColorSet.background100;
 
     // Message input theme.
     SBUTheme.messageInputTheme.backgroundColor = SBUColorSet.background100; */
-
+    // SBUTheme.messageCellTheme.backgroundColor = SBUColorSet.background100;
+    const color = new UIColor({red: (73.0 / 255.0), green: (19.0 / 255.0), blue: (137.0 / 255.0), alpha: (1.0)});
+    let channelListTheme = SBUChannelListTheme.new();
+    channelListTheme.navigationBarTintColor = color;
+    SBUTheme.setChannelListTheme(channelListTheme);
+    SBUStringSet.ChannelList_Header_Title = 'Chat';
+    SBUStringSet.Empty_No_Messages = "You haven't messaged this person yet\r\nPop them a line byt typing below";
+    SBUIconSet.iconMessage = null;
     this.delegateUi = new ChannelListViewController(callback);
     this.delegateUi._owner = new WeakRef(this);
     let naviVC = new UINavigationController({ rootViewController: this.delegateUi });

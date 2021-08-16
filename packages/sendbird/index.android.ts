@@ -123,10 +123,10 @@ export class Sendbird extends SendbirdCommon {
 
 	init(appId: string, userId: string, username: string, imageUrl: string) {
 		this.sendbird.init(appId, application.android.context);
-    this.sendbird.updateCurrentUserInfo(userId, username, null);
+    this.sendbird.updateCurrentUserInfo(username, imageUrl, (() => {}) as any);
 	}
 
-	connect(userId: string) {
+	connect(userId: string, nickname: string, profileUrl: string) {
 		return new Promise((resolve, reject) => {
 			const handler = new myConnectHandler(resolve, reject);
 			this.sendbird.connect(userId, handler);

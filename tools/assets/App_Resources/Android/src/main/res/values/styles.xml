@@ -48,7 +48,8 @@
       <item name="sb_appbar_style">@style/Widget.SendBird.AppBar</item>
       <item name="sb_recycler_view_style">@style/Widget.SendBird.RecyclerView</item>
       <item name="sb_dialog_view_style">@style/Widget.SendBird.DialogView</item>
-      <item name="sb_status_frame_style">@style/Widget.SendBird.StatusFrame</item>
+      <!-- <item name="sb_status_frame_style">@style/Widget.SendBird.StatusFrame</item> -->
+      <item name="sb_status_frame_style">@style/Widget.SendBird.StatusFrame.Custom</item>
       <item name="sb_toast_view_style">@style/Widget.SendBird.ToastView</item>
       <item name="sb_emoji_reaction_style">@style/Widget.SendBird.Emoji</item>
       <item name="sb_single_menu_item_style">@style/Widget.SendBird.SingleMenuItemView</item>
@@ -60,6 +61,23 @@
       <item name="sb_open_channel_message_admin_style">@style/Widget.SendBird.OpenChannel.Message.Admin</item>
       <item name="sb_open_channel_settings_style">@style/Widget.SendBird.OpenChannel.ChannelSettings</item>
     </style>
+
+    <style name="Widget.SendBird.StatusFrame.Custom">
+        <item name="sb_status_frame_background">@color/background_50</item>
+        <item name="sb_status_frame_text_appearance">@style/SendbirdButtonPrimary300</item>
+        <item name="sb_status_frame_icon_tint">@color/onlight_03</item>
+        <!-- <item name="sb_status_frame_action_background">@drawable/selector_button_retry_light</item> -->
+        <item name="sb_status_frame_empty_icon">@null</item>
+    </style>
+
+    <!-- <style name="SendbirdButtonPrimary300">
+      <item name="android:fontFamily">sans-serif</item>
+      <item name="android:textStyle">bold</item>
+      <item name="android:textSize">14sp</item>
+      <item name="android:letterSpacing">0.03</item>
+      <item name="android:lineSpacingExtra">2sp</item>
+      <item name="android:textColor">@color/error_500</item>
+    </style> -->
 
     <!-- <style name="Custom" parent="SendBird">
       <item name="sb_channel_message_list_style">@style/CustomMessageList</item>

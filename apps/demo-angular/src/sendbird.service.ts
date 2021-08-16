@@ -20,8 +20,8 @@ export class SendbirdService {
     }
   }
 
-  connect(user: string) {
-    this.sendbird.connect(user);
+  connect(user: string, nickname: string, profileUrl: string) {
+    this.sendbird.connect(user, nickname, profileUrl);
   }
 
   setCurrentUser(user: string, nickname: string, profileUrl: string) {
@@ -29,8 +29,7 @@ export class SendbirdService {
   }
 
   startUIKit() {
-    this.sendbirdUIKit.launch(() => {console.log('AQUIII na callback do dismiss');
-    });
+    this.sendbirdUIKit.launch(() => {console.log('AQUIII na callback do dismiss');});
   }
 
   getTotalUnreadMessages() {

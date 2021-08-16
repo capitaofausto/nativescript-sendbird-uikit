@@ -154,7 +154,7 @@ export class SendbirdUIKit {
     // Message input theme.
     SBUTheme.messageInputTheme.backgroundColor = SBUColorSet.background100; */
     // SBUTheme.messageCellTheme.backgroundColor = SBUColorSet.background100;
-    const color = new UIColor({red: (73.0 / 255.0), green: (19.0 / 255.0), blue: (137.0 / 255.0), alpha: (1.0)});
+    const color = new UIColor({red: 247 / 255.0, green: (245 / 255.0), blue: (255 / 255.0), alpha: 1});
     let channelListTheme = SBUChannelListTheme.new();
     channelListTheme.navigationBarTintColor = color;
     SBUTheme.setChannelListTheme(channelListTheme);

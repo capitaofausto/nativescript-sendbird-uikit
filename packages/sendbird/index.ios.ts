@@ -12,6 +12,7 @@ export class Sendbird extends SendbirdCommon {
             // Handle error.
             if(error) {
               reject(error)
+              return;
             }
             console.log('User is connected', user.nickname);
             SBDMain.updateCurrentUserInfoWithNicknameProfileUrlCompletionHandler(nickname, profileUrl, (error) => {
@@ -30,7 +31,8 @@ export class Sendbird extends SendbirdCommon {
       SBDOpenChannel.createChannelWithCompletionHandler((openChannel, error) => {
         if(error) {
           console.log('Sendbird Result Error');
-          reject(error)
+          reject(error);
+          return;
         }
         console.log('Channel created');
         resolve({data: openChannel.channelUrl})
@@ -44,6 +46,7 @@ export class Sendbird extends SendbirdCommon {
         if(error) {
           console.log('Sendbird enter channel Error');
           reject(error)
+          return;
         }
         console.log('Sendbird enter channel success');
         this.sendbirdChannel = openChannel;
@@ -62,6 +65,7 @@ export class Sendbird extends SendbirdCommon {
         if(error) {
           console.log('Send message Error');
           reject({ error });
+          return;
         }
         console.log('MESSAGE SENT', message);
 
@@ -92,6 +96,7 @@ export class Sendbird extends SendbirdCommon {
         if(error) {
           console.log('updateUnreadCount Error');
           reject({ error });
+          return;
         }
         console.log('TOTAL COUNT', totalCount);
 
@@ -105,7 +110,8 @@ export class Sendbird extends SendbirdCommon {
       SBDMain.registerDevicePushKitTokenUniqueCompletionHandler(new NSString({ string: token }).dataUsingEncoding(NSUTF8StringEncoding), true, (status, error) => {
         if (error) {
           console.error('Failed to register device token: ' + error);
-          reject(error)
+          reject(error);
+          return;
         }
         resolve();
       });

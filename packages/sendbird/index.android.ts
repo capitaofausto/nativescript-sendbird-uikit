@@ -248,6 +248,11 @@ export class SendbirdUIKit {
     activity.startActivity(intent);
   }
 
+  launchChannel(channelUrl: string, callback?: () => void) {
+    this.launch();
+    callback();
+  }
+
   setTheme(style: 'Light' | 'Dark'): void {
     const theme = this.sendbirdUIKit.ThemeMode[style]
     this.sendbirdUIKit.setDefaultThemeMode(theme)

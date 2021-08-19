@@ -173,6 +173,20 @@ export class SendbirdUIKit {
     naviVC.modalPresentationStyle = UIModalPresentationStyle.FullScreen;
     Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(naviVC, true, () => { console.log('COMPLETIONNNN'); });
   }
+
+  launchChannel(channelUrl: string) {
+    const app = UIApplication.sharedApplication;
+    const win = app.keyWindow || (app.windows && app.windows.count > 0 && app.windows.objectAtIndex(0));
+    let viewController = win.rootViewController;
+
+    const delegateUi = new SBUChannelViewController({channelUrl, messageListParams: null});
+    //this.delegateUi.initWithChannelUrlMessageListParams(channelUrl, null);
+    //delegateUi._owner = new WeakRef(this);
+
+    let naviVC = new UINavigationController({ rootViewController: delegateUi });
+    naviVC.modalPresentationStyle = 0 // FullScreen;
+    Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(naviVC, true, () => { console.log('View channel completed') });
+  }
 }
 
 @NativeClass()

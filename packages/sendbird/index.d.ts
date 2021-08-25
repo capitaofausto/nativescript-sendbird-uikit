@@ -19,6 +19,7 @@ export declare class SendbirdUIKit {
   init(appId: string, user: string, nickname: string, profileUrl: string): void {}
   launch(callback: dismissCallback): void {}
   launchChannel(channelUrl: string);
+  launchTabs();
   setCurrentUser(userId: string, nickname: string, profileUrl: string);
   setTheme(style: 'Light' | 'Dark'): void {}
 }

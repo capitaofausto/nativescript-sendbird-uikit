@@ -121,6 +121,7 @@ export class Sendbird extends SendbirdCommon {
 
 export class SendbirdUIKit {
   delegateUi: ChannelListViewController;
+  delegateTabsUi: MainChannelTabbarController;
 
   setCurrentUser(userId: string, nickname: string, profileUrl: string) {
     SBUGlobals.CurrentUser = new SBUUser({userId, nickname, profileUrl });
@@ -187,8 +188,18 @@ export class SendbirdUIKit {
     naviVC.modalPresentationStyle = 0 // FullScreen;
     Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(naviVC, true, () => { console.log('View channel completed') });
   }
-}
 
+  launchTabs() {
+    const app = UIApplication.sharedApplication;
+    const win = app.keyWindow || (app.windows && app.windows.count > 0 && app.windows.objectAtIndex(0));
+    let viewController = win.rootViewController;
+    this.delegateTabsUi = MainChannelTabbarController.initWithOwner(this);
+    this.delegateTabsUi._owner = new WeakRef(this);
+    //let naviVC = new UINavigationController({rootViewController: this.delegateTabsUi });
+    this.delegateTabsUi.modalPresentationStyle = UIModalPresentationStyle.FullScreen;
+    Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(this.delegateTabsUi, true, () => { console.log('COMPLETIONNNN'); });
+  }
+}
 @NativeClass()
 class OpenChannelChattingViewController extends UIViewController implements SBDChannelDelegate {
 	public static ObjCProtocols = [SBDChannelDelegate];
@@ -258,6 +269,104 @@ class ChannelListViewController extends SBUChannelListViewController {
   viewWillDisappear() {
     console.log('VIEW WILLL DISAPPEAR');
 		super.viewWillDisappear(true);
-    this.dismissCallback();
+    if(this.dismissCallback) {
+      this.dismissCallback();
+    }
   }
+}
+
+@NativeClass()
+class MainChannelTabbarController extends UITabBarController {
+  /* channelsViewController;
+  settingsViewController; */
+
+  channelsNavigationController;
+  communityNavigationController;
+  viewControllers;
+
+
+  // theme: SBUComponentTheme = SBUTheme.componentTheme;
+  isDarkMode: boolean = false;
+
+  _owner: WeakRef<any>;
+
+  static new(): MainChannelTabbarController {
+		return <MainChannelTabbarController>super.new(); // calls new() on the NSObject
+	}
+
+  public static initWithOwner(owner: any): MainChannelTabbarController {
+		let delegate = <MainChannelTabbarController>super.new();
+		delegate._owner = new WeakRef(owner);
+		return delegate;
+	}
+
+  viewDidLoad() {
+		console.log('VIEW DID LOAD CHANNELS');
+		super.viewDidLoad();
+    // ._owner = new WeakRef(this);
+    const channelsViewController = ChannelListViewController.initWithOwner(this);
+    channelsViewController._owner = new WeakRef(this);
+    /* const communityChannelsController = new CommunityChannelListViewController();
+    debugger
+    communityChannelsController._owner = new WeakRef(this); */
+    const channels2ViewController = ChannelListViewController.initWithOwner(this);
+    channelsViewController._owner = new WeakRef(this);
+    channelsViewController.titleView = UIView.new();
+    channelsViewController.leftBarButton = this.createLeftTitleItem("Channels");
+
+    this.channelsNavigationController = new UINavigationController({rootViewController: channelsViewController });
+    this.communityNavigationController = new UINavigationController({rootViewController: channels2ViewController });
+
+    let tabbarItems = [this.channelsNavigationController, this.communityNavigationController];
+    this.viewControllers = tabbarItems;
+
+    this.setupStyles(channelsViewController, channels2ViewController);
+
+    SBDMain.addChannelDelegateIdentifier(this, 'Channel 1');
+
+    // this.loadTotalUnreadMessageCount()
+	}
+
+  setupStyles(channelsViewController, communityChannelsController) {
+    // this.theme = SBUTheme.componentTheme;
+
+    this.tabBar.barTintColor =
+        UIColor.whiteColor;
+    this.tabBar.tintColor = this.isDarkMode
+        ? SBUColorSet.primary200
+        : SBUColorSet.primary300
+    channelsViewController.navigationItem.leftBarButtonItem = this.createLeftTitleItem("My chats");
+    channelsViewController.tabBarItem = this.createTabItem("Channels")
+
+    communityChannelsController.navigationItem.leftBarButtonItem = this.createLeftTitleItem("My chatrooms");
+    communityChannelsController.tabBarItem = this.createTabItem("Community");
+
+    this.channelsNavigationController.navigationBar.barStyle = this.isDarkMode
+        ? UIColor.blackColor
+        : UIColor.blueColor;
+    this.communityNavigationController.navigationBar.barStyle = this.isDarkMode
+        ? UIColor.blackColor
+        : UIColor.blueColor;
+  }
+
+  createLeftTitleItem(text: string): UIBarButtonItem {
+    let titleLabel = UILabel.new();
+    titleLabel.text = text;
+    titleLabel.font = UIFont.systemFontOfSizeWeight(18.0, UIFontWeightBold);
+    titleLabel.textColor = UIColor.blackColor;
+    return new UIBarButtonItem({customView: titleLabel});
+  }
+
+  createTabItem(type: any): UITabBarItem {
+    let iconSize = CGSizeMake(24, 24);
+    let title = type == "Channels" ? "My chats" : "My chatrooms"
+    let icon = type == "Channels"
+        ? (UIImage.imageNamed("iconChannels") as any)//.sd_resizedImageWithSizeScaleMode(iconSize)
+        : (UIImage.imageNamed("iconChannels") as any)//.sd_resizedImageWithSizeScaleMode(iconSize)
+    let tag = type == "Channels" ? 0 : 1
+
+    let item = new UITabBarItem({title: title, image: icon, tag: tag});
+    return item;
+  }
+
 }

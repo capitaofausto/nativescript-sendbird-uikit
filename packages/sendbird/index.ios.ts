@@ -240,6 +240,7 @@ class ChannelListViewController extends SBUChannelListViewController {
 
   public static ObjCExposedMethods = {
     viewDidLoad: { returns: interop.types.void, params: [] },
+    onClickCreate: { returns: interop.types.void, params: [] },
 	};
 
   _owner: WeakRef<any>;
@@ -273,6 +274,66 @@ class ChannelListViewController extends SBUChannelListViewController {
       this.dismissCallback();
     }
   }
+
+  onClickCreate() {
+    console.log('CREATE CHANNEL CLICKED');
+
+    if (this.createChannelTypeSelector != null) {
+      this.showCreateChannelTypeSelector();
+      return;
+    }
+
+    const createChannelVC = CreateChannelViewController.newWithType(ChannelType.Group);
+    this.navigationController.pushViewControllerAnimated(createChannelVC, true);
+  }
+}
+
+@NativeClass()
+class CreateChannelViewController extends SBUCreateChannelViewController {
+
+  public static ObjCExposedMethods = {
+    loadView: { returns: interop.types.void, params: [] },
+  };
+
+  static newWithType(type: ChannelType): CreateChannelViewController {
+    return this.alloc().initWithUsersType(null, type);
+  }
+
+  loadView() {
+    console.log('OVERRIDE: Load view overridden');
+    super.loadView();
+
+    const searchBar = UISearchBar.alloc().init();
+    searchBar.searchBarStyle = 0;
+    searchBar.placeholder = " Search...";
+    searchBar.sizeToFit();
+    searchBar.backgroundImage = UIImage.alloc().init();
+    searchBar.delegate = new UISearchBarDelegateImpl(this);
+    this.tableView.tableHeaderView = searchBar;
+  }
+}
+
+@NativeClass()
+class UISearchBarDelegateImpl extends NSObject implements UISearchBarDelegate {
+  public static ObjCProtocols = [UISearchBarDelegate];
+
+  constructor(private controller: CreateChannelViewController) {
+    super();
+  }
+
+  searchBarTextDidChange(searchBar: UISearchBar, searchText: string) {
+    console.log('SEARCH BAR TEXT CHANGED: ' + searchText);
+
+    const listQuery = SBDMain.createApplicationUserListQuery();
+    listQuery.nicknameStartsWithFilter = searchText;
+    listQuery.loadNextPageWithCompletionHandler((data, error) => {
+      if (error) {
+        console.log('ERROR LOADING FILTERED USERS', error);
+      }
+      this.controller.loadNextUserListWithResetUsers(true, data['sbu_convertUserList']());
+    });
+  }
+
 }
 
 @NativeClass()

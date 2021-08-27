@@ -243,7 +243,7 @@ export class SendbirdUIKit {
 
   launch() {
     var context = application.android.context;
-    var intent = new android.content.Intent(context, (com as any).tns.MainActivity.class);
+    var intent = new android.content.Intent(context, (com as any).tns.CustomChannelListActivity.class);
     let activity = application.android.foregroundActivity || application.android.startActivity;
     activity.startActivity(intent);
   }

@@ -30,7 +30,7 @@ export class SendbirdService {
 
   startUIKit() {
     // this.sendbirdUIKit.launch(() => {console.log('AQUIII na callback do dismiss');});
-    this.sendbirdUIKit.launchTabs();
+    this.sendbirdUIKit.launchTabs(() => {console.log('AQUIII na callback do dismiss');}, {fandom: ["swifties", "army"]});
   }
 
   getTotalUnreadMessages() {

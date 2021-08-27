@@ -1,5 +1,5 @@
-import { SendbirdCommon, APP_ID, dismissCallback } from './common';
-import { Utils, Frame } from '@nativescript/core';
+import { SendbirdCommon, APP_ID, dismissCallback, SendbirdFilters } from './common';
+import { Utils, Frame, prompt, PromptOptions, inputType, capitalizationType, PromptResult } from '@nativescript/core';
 
 export class Sendbird extends SendbirdCommon {
 
@@ -189,52 +189,20 @@ export class SendbirdUIKit {
     Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(naviVC, true, () => { console.log('View channel completed') });
   }
 
-  launchTabs() {
+  launchTabs(callback: dismissCallback, filters: SendbirdFilters = {}) {
     const app = UIApplication.sharedApplication;
     const win = app.keyWindow || (app.windows && app.windows.count > 0 && app.windows.objectAtIndex(0));
     let viewController = win.rootViewController;
-    this.delegateTabsUi = MainChannelTabbarController.initWithOwner(this);
+    this.delegateTabsUi = new MainChannelTabbarController(callback, filters);
     this.delegateTabsUi._owner = new WeakRef(this);
+    const color = new UIColor({red: 247 / 255.0, green: (245 / 255.0), blue: (255 / 255.0), alpha: 1});
+    let channelListTheme = SBUChannelListTheme.new();
+    channelListTheme.navigationBarTintColor = color;
     //let naviVC = new UINavigationController({rootViewController: this.delegateTabsUi });
     this.delegateTabsUi.modalPresentationStyle = UIModalPresentationStyle.FullScreen;
     Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(this.delegateTabsUi, true, () => { console.log('COMPLETIONNNN'); });
   }
 }
-@NativeClass()
-class OpenChannelChattingViewController extends UIViewController implements SBDChannelDelegate {
-	public static ObjCProtocols = [SBDChannelDelegate];
-	public static ObjCExposedMethods = {
-    viewDidLoad: { returns: interop.types.void, params: [] },
-		channelDidReceiveMessage: { returns: SBDBaseMessage, params: [] },
-	};
-
-  _owner: WeakRef<SBDBaseChannel>;
-  static channelUrl;
-	// agoraKit: AgoraRtcEngineKit;
-
-	static new(): OpenChannelChattingViewController {
-		return <OpenChannelChattingViewController>super.new(); // calls new() on the NSObject
-	}
-
-	public static initWithOwner(owner: SBDBaseChannel, channelUrl): OpenChannelChattingViewController {
-		let delegate = <OpenChannelChattingViewController>super.new();
-    this.channelUrl = channelUrl;
-		delegate._owner = new WeakRef(owner);
-		return delegate;
-	}
-
-  viewDidLoad() {
-		console.log('VIEW DID LOAD', OpenChannelChattingViewController.channelUrl);
-		super.viewDidLoad();
-    SBDMain.addChannelDelegateIdentifier(this, OpenChannelChattingViewController.channelUrl);
-	}
-
-  channelDidReceiveMessage(sender: SBDBaseChannel, message: SBDBaseMessage) {
-    console.log('ARRIVED MESSAGE', message);
-  }
-
-}
-
 @NativeClass()
 class ChannelListViewController extends SBUChannelListViewController {
 
@@ -247,7 +215,12 @@ class ChannelListViewController extends SBUChannelListViewController {
   dismissCallback: dismissCallback;
 
   constructor(dismissCalback: dismissCallback) {
-    super({channelListQuery: null})
+    let listQuery = SBDGroupChannel.createMyGroupChannelListQuery();
+    listQuery.superChannelFilter = SBDGroupChannelSuperChannelFilter.NonSuper;
+    listQuery.includeEmptyChannel = false;
+    /* listQuery.includeEmptyChannel = true;
+    listQuery.includeFrozenChannel = true; */
+    super({channelListQuery: listQuery});
     this.dismissCallback = dismissCalback;
   }
 
@@ -267,7 +240,6 @@ class ChannelListViewController extends SBUChannelListViewController {
 	}
 
   viewWillDisappear() {
-    console.log('VIEW WILLL DISAPPEAR');
 		super.viewWillDisappear(true);
     if(this.dismissCallback) {
       this.dismissCallback();
@@ -276,26 +248,6 @@ class ChannelListViewController extends SBUChannelListViewController {
 
   onClickCreate() {
     console.log('CREATE CHANNEL CLICKED');
-
-    if (this.createChannelTypeSelector != null) {
-      this.showCreateChannelTypeSelector();
-      return;
-    }
-
-    console.log('SUPPORT SUPER', SBUAvailable.isSupportSuperGroupChannel());
-    console.log('SUPPORT BROADCAST', SBUAvailable.isSupportBroadcastChannel());
-
-
-    /* if (SBUAvailable.isSupportSuperGroupChannel() || SBUAvailable.isSupportBroadcastChannel()) {
-
-    } */
-
-    /* SBUActionSheet.show(
-      items: itmes,
-      cancelItem: self.cancelItem,
-      oneTimetheme: isOverlay ? SBUComponentTheme.dark : nil,
-      delegate: self
-    ) */
 
     const createChannelVC = CreateChannelViewController.newWithType(ChannelType.Group);
     // const createChannelVC = CreateChannelViewController.newWithType(ChannelType.Supergroup);
@@ -353,18 +305,23 @@ class UISearchBarDelegateImpl extends NSObject implements UISearchBarDelegate {
 
 @NativeClass()
 class MainChannelTabbarController extends UITabBarController {
-  /* channelsViewController;
-  settingsViewController; */
 
-  channelsNavigationController;
-  otherChannelsNavigationController;
+  groupChannelsNavigationController;
+  myChatroomsNavigationController;
+  allChatroomsNavigationController;
   viewControllers;
 
-
-  // theme: SBUComponentTheme = SBUTheme.componentTheme;
   isDarkMode: boolean = false;
-
+  dismissCallback: dismissCallback;
+  filters: SendbirdFilters;
   _owner: WeakRef<any>;
+
+  constructor(dismissCalback: dismissCallback, filters: SendbirdFilters) {
+    super({coder: null});
+    this.dismissCallback = dismissCalback;
+    this.filters = filters;
+    debugger
+  }
 
   static new(): MainChannelTabbarController {
 		return <MainChannelTabbarController>super.new(); // calls new() on the NSObject
@@ -379,46 +336,47 @@ class MainChannelTabbarController extends UITabBarController {
   viewDidLoad() {
 		console.log('VIEW DID LOAD CHANNELS');
 		super.viewDidLoad();
-    // ._owner = new WeakRef(this);
-    const channelsViewController = ChannelListViewController.initWithOwner(this);
-    channelsViewController._owner = new WeakRef(this);
-    /* const supergroupsChannelsController = new SupergroupsChannelListViewController();
-    debugger
-    supergroupsChannelsController._owner = new WeakRef(this); */
-    channelsViewController._owner = new WeakRef(this);
+
+    const channelsViewController = new ChannelListViewController(null);
+    // channelsViewController._owner = new WeakRef(this);
     channelsViewController.titleView = UIView.new();
-    channelsViewController.leftBarButton = this.createLeftTitleItem("Channels");
 
-    /* WIP SUPER */
-    // const supergroupsViewController = new SupergroupChannelListViewController(null);
-    /* let listQuery = SBDGroupChannel.createMyGroupChannelListQuery()
+    /* MY SUPERGROUPS QUERY */
+    let listQuery = SBDGroupChannel.createMyGroupChannelListQuery();
+    listQuery.superChannelFilter = SBDGroupChannelSuperChannelFilter.Super;
     listQuery.includeEmptyChannel = true;
-    listQuery.includeFrozenChannel = true;
-    let channelListVC = new SBUChannelListViewController({channelListQuery: listQuery})
-    this.supergroupsNavigationController = new UINavigationController({rootViewController: channelListVC }); */
-    /* WIP SUPER */
+    let customFiltersArray = [];
+    for (const key in this.filters) {
+      if (Object.prototype.hasOwnProperty.call(this.filters, key)) {
+        customFiltersArray.push(...this.filters[key].map(value => `${key}_${value}`));
+      }
+    }
+    listQuery.customTypesFilter = new NSArray({array: customFiltersArray});
+    /* MY SUPERGROUPS QUERY */
 
-    /* WIP OPEN */
-    const openChannelsViewController = new OpenChannelListViewController(null);
-    this.otherChannelsNavigationController = new UINavigationController({rootViewController: openChannelsViewController });
+    const mySupergroupsViewController = new SupergroupChannelListViewController(null, this.filters, listQuery);
+    mySupergroupsViewController.titleView = UIView.new();
+    /* ALL SUPERGROUPS QUERY */
 
-    /* WIP OPEN */
+    /* ALL SUPERGROUPS QUERY */
+    const allSupergroupsViewController = new SupergroupChannelListViewController(null, this.filters, listQuery);
+    allSupergroupsViewController.titleView = UIView.new();
 
-    debugger
+    this.groupChannelsNavigationController = new UINavigationController({rootViewController: channelsViewController });
+    this.myChatroomsNavigationController = new UINavigationController({rootViewController: mySupergroupsViewController });
+    this.allChatroomsNavigationController = new UINavigationController({rootViewController: allSupergroupsViewController });
 
-    this.channelsNavigationController = new UINavigationController({rootViewController: channelsViewController });
-
-    let tabbarItems = [this.channelsNavigationController, this.otherChannelsNavigationController];
+    let tabbarItems = [this.groupChannelsNavigationController, this.myChatroomsNavigationController, this.allChatroomsNavigationController];
     this.viewControllers = tabbarItems;
 
-    this.setupStyles(channelsViewController, openChannelsViewController);
+    this.setupStyles(channelsViewController, mySupergroupsViewController, allSupergroupsViewController);
 
     SBDMain.addChannelDelegateIdentifier(this, 'Channel 1');
 
     // this.loadTotalUnreadMessageCount()
 	}
 
-  setupStyles(channelsViewController, otherChannelsViewController) {
+  setupStyles(channelsViewController, mySupergroupsViewController, allSupergroupsViewController) {
     // this.theme = SBUTheme.componentTheme;
 
     this.tabBar.barTintColor =
@@ -426,16 +384,26 @@ class MainChannelTabbarController extends UITabBarController {
     this.tabBar.tintColor = this.isDarkMode
         ? SBUColorSet.primary200
         : SBUColorSet.primary300
+
+    channelsViewController.leftBarButton = this.createLeftTitleItem("My Chats");
     channelsViewController.navigationItem.leftBarButtonItem = this.createLeftTitleItem("My chats");
-    channelsViewController.tabBarItem = this.createTabItem("Channels")
+    channelsViewController.tabBarItem = this.createTabItem("My chats");
 
-    otherChannelsViewController.navigationItem.leftBarButtonItem = this.createLeftTitleItem("My chatrooms");
-    otherChannelsViewController.tabBarItem = this.createTabItem("Community");
+    mySupergroupsViewController.leftBarButton = this.createLeftTitleItem("My Chatrooms");
+    mySupergroupsViewController.navigationItem.leftBarButtonItem = this.createLeftTitleItem("My Chatrooms");
+    mySupergroupsViewController.tabBarItem = this.createTabItem("My chatrooms");
 
-    this.channelsNavigationController.navigationBar.barStyle = this.isDarkMode
+    allSupergroupsViewController.leftBarButton = this.createLeftTitleItem("All chatrooms");
+    allSupergroupsViewController.navigationItem.leftBarButtonItem = this.createLeftTitleItem("All Chatrooms");
+    allSupergroupsViewController.tabBarItem = this.createTabItem("All chatrooms");
+
+    this.groupChannelsNavigationController.navigationBar.barStyle = this.isDarkMode
         ? UIColor.blackColor
         : UIColor.blueColor;
-    this.otherChannelsNavigationController.navigationBar.barStyle = this.isDarkMode
+    this.myChatroomsNavigationController.navigationBar.barStyle = this.isDarkMode
+        ? UIColor.blackColor
+        : UIColor.blueColor;
+    this.allChatroomsNavigationController.navigationBar.barStyle = this.isDarkMode
         ? UIColor.blackColor
         : UIColor.blueColor;
   }
@@ -450,37 +418,72 @@ class MainChannelTabbarController extends UITabBarController {
 
   createTabItem(type: any): UITabBarItem {
     let iconSize = CGSizeMake(24, 24);
-    let title = type == "Channels" ? "My chats" : "My chatrooms"
-    let icon = type == "Channels"
-        ? (UIImage.imageNamed("iconChannels") as any)//.sd_resizedImageWithSizeScaleMode(iconSize)
-        : (UIImage.imageNamed("iconChannels") as any)//.sd_resizedImageWithSizeScaleMode(iconSize)
+    let title = type;
+    let icon = type == "My chats"
+      ? this.resizeImage(UIImage.imageNamed("iconChat"), iconSize)
+      : type == "My chatrooms"
+        ? this.resizeImage(UIImage.imageNamed("iconSupergroup"), iconSize)
+        : this.resizeImage(UIImage.imageNamed("iconChatrooms"), iconSize);
+    /* type == "My chats"
+        ? (UIImage.imageNamed("iconChat") as any)//.sd_resizedImageWithSizeScaleMode(iconSize)
+        : (UIImage.imageNamed("iconChannels") as any)//.sd_resizedImageWithSizeScaleMode(iconSize) */
     let tag = type == "Channels" ? 0 : 1
 
     let item = new UITabBarItem({title: title, image: icon, tag: tag});
     return item;
   }
 
+  resizeImage(image: UIImage, targetSize: CGSize): UIImage {
+    let size = image.size
+
+    let widthRatio  = targetSize.width  / image.size.width
+    let heightRatio = targetSize.height / image.size.height
+
+    // Figure out what our orientation is, and use that to form the rectangle
+    var newSize: CGSize
+    if(widthRatio > heightRatio) {
+        newSize = CGSizeMake(size.width * heightRatio, size.height * heightRatio);
+    } else {
+        newSize = CGSizeMake(size.width * widthRatio, size.height * widthRatio);
+    }
+
+    // This is the rect that we've calculated out and this is what is actually used below
+    let rect = CGRectMake(0, 0, newSize.width, newSize.height);
+
+    // Actually do the resizing to the rect using the ImageContext stuff
+    UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
+    image.drawInRect(rect);
+    let newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    return newImage!;
+  }
+
 }
 
 @NativeClass()
-class SupergroupChannelListViewController extends SBUChannelListViewController {
-
+class SupergroupChannelListViewController extends SBUChannelListViewController implements SBUActionSheetDelegate {
+  public static ObjCProtocols = [SBUActionSheetDelegate];
   public static ObjCExposedMethods = {
     viewDidLoad: { returns: interop.types.void, params: [] },
     onClickCreate: { returns: interop.types.void, params: [] },
 	};
 
   _owner: WeakRef<any>;
+  filters: SendbirdFilters;
   dismissCallback: dismissCallback;
 
-  constructor(dismissCalback: dismissCallback) {
-    let listQuery = SBDGroupChannel.createMyGroupChannelListQuery()
-    listQuery.superChannelFilter = SBDGroupChannelSuperChannelFilter.Super;
-    listQuery.includeEmptyChannel = true;
+  constructor(dismissCalback: dismissCallback, filters: SendbirdFilters, listQuery: any) {
     // listQuery.publicChannelFilter = SBDGroupChannelPublicChannelFilter.Public;
     super({channelListQuery: listQuery});
-    // super({channelListQuery: null});
+    this.filters = filters;
     this.dismissCallback = dismissCalback;
+  }
+
+  didSelectActionSheetItemWithIndexIdentifier(index: number, identifier: number): void {
+    console.log('AQUIIII', index, identifier);
+
+    // throw new Error('Method not implemented.');
   }
 
 	static new(): ChannelListViewController {
@@ -510,7 +513,6 @@ class SupergroupChannelListViewController extends SBUChannelListViewController {
 	}
 
   viewWillDisappear() {
-    console.log('VIEW WILLL DISAPPEAR');
 		super.viewWillDisappear(true);
     if(this.dismissCallback) {
       this.dismissCallback();
@@ -520,33 +522,94 @@ class SupergroupChannelListViewController extends SBUChannelListViewController {
   onClickCreate() {
     console.log('CREATE CHANNEL CLICKED');
 
-    if (this.createChannelTypeSelector != null) {
-      this.showCreateChannelTypeSelector();
-      return;
+    let options: PromptOptions = {
+      title: "Channel Name",
+      defaultText: "",
+      message: "Enter channel name",
+      okButtonText: "Create",
+      cancelButtonText: "Cancel",
+      cancelable: true,
+      inputType: inputType.text, // email, number, text, password, or email
+      capitalizationType: capitalizationType.sentences // all. none, sentences or words
+    };
+
+    let fandomOptions = [];
+    for (const key in this.filters) {
+      if (Object.prototype.hasOwnProperty.call(this.filters, key) && key === 'fandom') {
+        // const element = filters[key];
+        fandomOptions.push(...this.filters['fandom']);
+      }
+    }
+    if(fandomOptions.length > 1) {
+      const actionItems = fandomOptions.map((fandom => {
+        return new SBUActionSheetItem({
+          title: `${fandom.toUpperCase()} Fandom`,
+          color: null,
+          image: null,
+          font: null,
+          textAlignment: null,
+          completionHandler: () => {
+            console.log(`SELLECTED ${fandom}`);
+            let customType = `fandom_${fandom}`;
+            prompt(options).then((result: PromptResult) => {
+              debugger
+              if(result.text) {
+                this.createChannel(result.text, customType);
+              }
+            });
+          }
+        });
+      }));
+      let cancelItem = new SBUActionSheetItem({
+        title: SBUStringSet.Cancel,
+        color: UIColor.blackColor,
+        image: null,
+        font: null,
+        textAlignment: null,
+        completionHandler: () => {
+          console.log('SELLECTED CANCEL');
+        }
+      });
+
+      SBUActionSheet.showWithItemsCancelItemIdentifierOneTimethemeDelegate(
+        actionItems,
+        cancelItem,
+        1,
+        SBUComponentTheme.light,
+        this
+      )
+    } else if(fandomOptions.length === 1) {
+      prompt(options).then((result: PromptResult) => {
+        if(result.text) {
+          let customType = `fandom_${fandomOptions[0]}`;
+          this.createChannel(result.text, customType);
+        }
+      });
     }
 
-    console.log('SUPPORT SUPER', SBUAvailable.isSupportSuperGroupChannel());
-    console.log('SUPPORT BROADCAST', SBUAvailable.isSupportBroadcastChannel());
+  }
 
+  createChannel(channelName: string, customType) {
+    let params = new SBDGroupChannelParams();
+    params.isSuper = true
+    params.isPublic = true
+    params.name = channelName;
+    params.customType = customType;
 
-    /* if (SBUAvailable.isSupportSuperGroupChannel() || SBUAvailable.isSupportBroadcastChannel()) {
+    SBDGroupChannel.createChannelWithParamsCompletionHandler(params, (groupChannel, error) => {
+      let channelUrl = groupChannel?.channelUrl;
+      SBUMain.openChannelWithChannelUrlBasedOnChannelListMessageListParams(
+        channelUrl,
+        false,
+        null
+      )
+      // SUCCESS ON CREATION
+    })
 
-    } */
-
-    /* SBUActionSheet.show(
-      items: itmes,
-      cancelItem: self.cancelItem,
-      oneTimetheme: isOverlay ? SBUComponentTheme.dark : nil,
-      delegate: self
-    ) */
-
-    const createChannelVC = CreateChannelViewController.newWithType(ChannelType.Group);
-    // const createChannelVC = CreateChannelViewController.newWithType(ChannelType.Supergroup);
-    this.navigationController.pushViewControllerAnimated(createChannelVC, true);
   }
 }
 
-@NativeClass()
+/* @NativeClass()
 class OpenChannelListViewController extends SBUChannelListViewController {
 
   public static ObjCExposedMethods = {
@@ -558,11 +621,11 @@ class OpenChannelListViewController extends SBUChannelListViewController {
   dismissCallback: dismissCallback;
 
   constructor(dismissCalback: dismissCallback) {
-    /*  let listQuery = SBDGroupChannel.createMyGroupChannelListQuery()
-    listQuery.superChannelFilter = SBDGroupChannelSuperChannelFilter.Super;
-    listQuery.includeEmptyChannel = true;
-    // listQuery.publicChannelFilter = SBDGroupChannelPublicChannelFilter.Public;
-    super({channelListQuery: listQuery}); */
+    // let listQuery = SBDGroupChannel.createMyGroupChannelListQuery()
+    // listQuery.superChannelFilter = SBDGroupChannelSuperChannelFilter.Super;
+    // listQuery.includeEmptyChannel = true;
+    // // listQuery.publicChannelFilter = SBDGroupChannelPublicChannelFilter.Public;
+    // super({channelListQuery: listQuery});
     super({channelListQuery: null});
     this.dismissCallback = dismissCalback;
   }
@@ -580,34 +643,34 @@ class OpenChannelListViewController extends SBUChannelListViewController {
   viewDidLoad() {
 		console.log('VIEW DID LOAD');
 		super.viewDidLoad();
-    let listQuery = SBDOpenChannel.createOpenChannelListQuery()!
+    // let listQuery = SBDOpenChannel.createOpenChannelListQuery()!
 
-    listQuery.loadNextPageWithCompletionHandler((openChannels, error) => {
+    // listQuery.loadNextPageWithCompletionHandler((openChannels, error) => {
 
 
-        // A list of open channels is successfully retrieved.
-        // Through the "openChannels" parameter of the callback method,
-        // you can access the data of each open channel from the result list that Sendbird server has passed to the callback method.
-        // this.channels += openChannels!
-        debugger
-        this.updateChannelsNeedReload(openChannels as any, true)
-        // data['sbu_convertUserList']()
-    })
-    /* let listQuery = SBDGroupChannel.createMyGroupChannelListQuery();
-    listQuery.superChannelFilter = SBDGroupChannelSuperChannelFilter.Super;
-    listQuery.loadNextPageWithCompletionHandler( (groupChannels, error) => {
+    //     // A list of open channels is successfully retrieved.
+    //     // Through the "openChannels" parameter of the callback method,
+    //     // you can access the data of each open channel from the result list that Sendbird server has passed to the callback method.
+    //     // this.channels += openChannels!
+    //     debugger
+    //     this.updateChannelsNeedReload(openChannels as any, true)
+    //     // this.channelList += channels;
+    //     // data['sbu_convertUserList']()
+    // })
+    // let listQuery = SBDGroupChannel.createMyGroupChannelListQuery();
+    // listQuery.superChannelFilter = SBDGroupChannelSuperChannelFilter.Super;
+    // listQuery.loadNextPageWithCompletionHandler( (groupChannels, error) => {
 
-        debugger
-        // A list of matching group channels is successfully retrieved.
-        // Through the "groupChannels" parameter of the callback method,
-        // you can access the data of each group channel from the result list that Sendbird server has passed to the callback method.
-        //self.channels += groupChannels!
-        // ...
-    }) */
+    //     debugger
+    //     // A list of matching group channels is successfully retrieved.
+    //     // Through the "groupChannels" parameter of the callback method,
+    //     // you can access the data of each group channel from the result list that Sendbird server has passed to the callback method.
+    //     //self.channels += groupChannels!
+    //     // ...
+    // })
 	}
 
   viewWillDisappear() {
-    console.log('VIEW WILLL DISAPPEAR');
 		super.viewWillDisappear(true);
     if(this.dismissCallback) {
       this.dismissCallback();
@@ -625,20 +688,43 @@ class OpenChannelListViewController extends SBUChannelListViewController {
     console.log('SUPPORT SUPER', SBUAvailable.isSupportSuperGroupChannel());
     console.log('SUPPORT BROADCAST', SBUAvailable.isSupportBroadcastChannel());
 
-
-    /* if (SBUAvailable.isSupportSuperGroupChannel() || SBUAvailable.isSupportBroadcastChannel()) {
-
-    } */
-
-    /* SBUActionSheet.show(
-      items: itmes,
-      cancelItem: self.cancelItem,
-      oneTimetheme: isOverlay ? SBUComponentTheme.dark : nil,
-      delegate: self
-    ) */
-
     const createChannelVC = CreateChannelViewController.newWithType(ChannelType.Group);
     // const createChannelVC = CreateChannelViewController.newWithType(ChannelType.Supergroup);
     this.navigationController.pushViewControllerAnimated(createChannelVC, true);
   }
+} */
+
+@NativeClass()
+class OpenChannelChattingViewController extends UIViewController implements SBDChannelDelegate {
+	public static ObjCProtocols = [SBDChannelDelegate];
+	public static ObjCExposedMethods = {
+    viewDidLoad: { returns: interop.types.void, params: [] },
+		channelDidReceiveMessage: { returns: SBDBaseMessage, params: [] },
+	};
+
+  _owner: WeakRef<SBDBaseChannel>;
+  static channelUrl;
+	// agoraKit: AgoraRtcEngineKit;
+
+	static new(): OpenChannelChattingViewController {
+		return <OpenChannelChattingViewController>super.new(); // calls new() on the NSObject
+	}
+
+	public static initWithOwner(owner: SBDBaseChannel, channelUrl): OpenChannelChattingViewController {
+		let delegate = <OpenChannelChattingViewController>super.new();
+    this.channelUrl = channelUrl;
+		delegate._owner = new WeakRef(owner);
+		return delegate;
+	}
+
+  viewDidLoad() {
+		console.log('VIEW DID LOAD', OpenChannelChattingViewController.channelUrl);
+		super.viewDidLoad();
+    SBDMain.addChannelDelegateIdentifier(this, OpenChannelChattingViewController.channelUrl);
+	}
+
+  channelDidReceiveMessage(sender: SBDBaseChannel, message: SBDBaseMessage) {
+    console.log('ARRIVED MESSAGE', message);
+  }
+
 }

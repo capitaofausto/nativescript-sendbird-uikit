@@ -2,6 +2,9 @@ import { SendbirdCommon } from './common';
 export interface dismissCallback {
   (): void;
 }
+export interface SendbirdFilters {
+  [key: string]: string[]
+}
 export declare class Sendbird extends SendbirdCommon {
   init(appId: string, userId: string, nickname: string, profileUrl: string) {}
   connect(userId: string, nickname: string, profileUrl: string): Promise<{data: com.sendbird.android.User}> {}
@@ -19,7 +22,7 @@ export declare class SendbirdUIKit {
   init(appId: string, user: string, nickname: string, profileUrl: string): void {}
   launch(callback: dismissCallback): void {}
   launchChannel(channelUrl: string);
-  launchTabs();
+  launchTabs(callback: dismissCallback, filters?: SendbirdFilters);
   setCurrentUser(userId: string, nickname: string, profileUrl: string);
   setTheme(style: 'Light' | 'Dark'): void {}
 }

@@ -14,9 +14,9 @@ export class SendbirdService {
 
   init(user: string, nickname: string, profileUrl: string) {
     if(isIOS) {
-      this.sendbirdUIKit.init('1B1FEC58-BDF5-499E-832A-5C06E86EAD9C', user, nickname, profileUrl);
+      this.sendbirdUIKit.init('DA7C051A-70F5-42C4-83E9-7F47C8755C4B', user, nickname, profileUrl);
     } else {
-      this.sendbirdUIKit.init('1B1FEC58-BDF5-499E-832A-5C06E86EAD9C', user, nickname, profileUrl);
+      this.sendbirdUIKit.init('DA7C051A-70F5-42C4-83E9-7F47C8755C4B', user, nickname, profileUrl);
     }
   }
 
@@ -29,7 +29,8 @@ export class SendbirdService {
   }
 
   startUIKit() {
-    this.sendbirdUIKit.launch(() => {console.log('AQUIII na callback do dismiss');});
+    // this.sendbirdUIKit.launch(() => {console.log('AQUIII na callback do dismiss');});
+    this.sendbirdUIKit.launchTabs(() => {console.log('AQUIII na callback do dismiss');}, {fandom: ["swifties", "army"]});
   }
 
   getTotalUnreadMessages() {

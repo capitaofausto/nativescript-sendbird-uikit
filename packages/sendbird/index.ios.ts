@@ -12,6 +12,7 @@ export class Sendbird extends SendbirdCommon {
             // Handle error.
             if(error) {
               reject(error)
+              return;
             }
             console.log('User is connected', user.nickname);
             SBDMain.updateCurrentUserInfoWithNicknameProfileUrlCompletionHandler(nickname, profileUrl, (error) => {
@@ -30,7 +31,8 @@ export class Sendbird extends SendbirdCommon {
       SBDOpenChannel.createChannelWithCompletionHandler((openChannel, error) => {
         if(error) {
           console.log('Sendbird Result Error');
-          reject(error)
+          reject(error);
+          return;
         }
         console.log('Channel created');
         resolve({data: openChannel.channelUrl})
@@ -44,6 +46,7 @@ export class Sendbird extends SendbirdCommon {
         if(error) {
           console.log('Sendbird enter channel Error');
           reject(error)
+          return;
         }
         console.log('Sendbird enter channel success');
         this.sendbirdChannel = openChannel;
@@ -62,6 +65,7 @@ export class Sendbird extends SendbirdCommon {
         if(error) {
           console.log('Send message Error');
           reject({ error });
+          return;
         }
         console.log('MESSAGE SENT', message);
 
@@ -92,6 +96,7 @@ export class Sendbird extends SendbirdCommon {
         if(error) {
           console.log('updateUnreadCount Error');
           reject({ error });
+          return;
         }
         console.log('TOTAL COUNT', totalCount);
 
@@ -105,7 +110,8 @@ export class Sendbird extends SendbirdCommon {
       SBDMain.registerDevicePushKitTokenUniqueCompletionHandler(new NSString({ string: token }).dataUsingEncoding(NSUTF8StringEncoding), true, (status, error) => {
         if (error) {
           console.error('Failed to register device token: ' + error);
-          reject(error)
+          reject(error);
+          return;
         }
         resolve();
       });
@@ -167,6 +173,20 @@ export class SendbirdUIKit {
     naviVC.modalPresentationStyle = UIModalPresentationStyle.FullScreen;
     Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(naviVC, true, () => { console.log('COMPLETIONNNN'); });
   }
+
+  launchChannel(channelUrl: string) {
+    const app = UIApplication.sharedApplication;
+    const win = app.keyWindow || (app.windows && app.windows.count > 0 && app.windows.objectAtIndex(0));
+    let viewController = win.rootViewController;
+
+    const delegateUi = new SBUChannelViewController({channelUrl, messageListParams: null});
+    //this.delegateUi.initWithChannelUrlMessageListParams(channelUrl, null);
+    //delegateUi._owner = new WeakRef(this);
+
+    let naviVC = new UINavigationController({ rootViewController: delegateUi });
+    naviVC.modalPresentationStyle = 0 // FullScreen;
+    Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(naviVC, true, () => { console.log('View channel completed') });
+  }
 }
 
 @NativeClass()
@@ -209,6 +229,7 @@ class ChannelListViewController extends SBUChannelListViewController {
 
   public static ObjCExposedMethods = {
     viewDidLoad: { returns: interop.types.void, params: [] },
+    onClickCreate: { returns: interop.types.void, params: [] },
 	};
 
   _owner: WeakRef<any>;
@@ -240,4 +261,64 @@ class ChannelListViewController extends SBUChannelListViewController {
 		super.viewWillDisappear(true);
     this.dismissCallback();
   }
+
+  onClickCreate() {
+    console.log('CREATE CHANNEL CLICKED');
+
+    if (this.createChannelTypeSelector != null) {
+      this.showCreateChannelTypeSelector();
+      return;
+    }
+
+    const createChannelVC = CreateChannelViewController.newWithType(ChannelType.Group);
+    this.navigationController.pushViewControllerAnimated(createChannelVC, true);
+  }
+}
+
+@NativeClass()
+class CreateChannelViewController extends SBUCreateChannelViewController {
+
+  public static ObjCExposedMethods = {
+    loadView: { returns: interop.types.void, params: [] },
+  };
+
+  static newWithType(type: ChannelType): CreateChannelViewController {
+    return this.alloc().initWithUsersType(null, type);
+  }
+
+  loadView() {
+    console.log('OVERRIDE: Load view overridden');
+    super.loadView();
+
+    const searchBar = UISearchBar.alloc().init();
+    searchBar.searchBarStyle = 0;
+    searchBar.placeholder = " Search...";
+    searchBar.sizeToFit();
+    searchBar.backgroundImage = UIImage.alloc().init();
+    searchBar.delegate = new UISearchBarDelegateImpl(this);
+    this.tableView.tableHeaderView = searchBar;
+  }
+}
+
+@NativeClass()
+class UISearchBarDelegateImpl extends NSObject implements UISearchBarDelegate {
+  public static ObjCProtocols = [UISearchBarDelegate];
+
+  constructor(private controller: CreateChannelViewController) {
+    super();
+  }
+
+  searchBarTextDidChange(searchBar: UISearchBar, searchText: string) {
+    console.log('SEARCH BAR TEXT CHANGED: ' + searchText);
+
+    const listQuery = SBDMain.createApplicationUserListQuery();
+    listQuery.nicknameStartsWithFilter = searchText;
+    listQuery.loadNextPageWithCompletionHandler((data, error) => {
+      if (error) {
+        console.log('ERROR LOADING FILTERED USERS', error);
+      }
+      this.controller.loadNextUserListWithResetUsers(true, data['sbu_convertUserList']());
+    });
+  }
+
 }

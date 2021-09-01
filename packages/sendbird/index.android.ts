@@ -248,6 +248,10 @@ export class SendbirdUIKit {
     activity.startActivity(intent);
   }
 
+  joinChannel(channelUrl: string): Promise<void> {
+    return Promise.resolve();
+  }
+
   launchChannel(channelUrl: string) {
     const context = application.android.context;
     const intent = com.sendbird.uikit.activities.ChannelActivity.newIntent(context, channelUrl);

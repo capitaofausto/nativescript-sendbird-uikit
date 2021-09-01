@@ -174,6 +174,24 @@ export class SendbirdUIKit {
     Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(naviVC, true, () => { console.log('COMPLETIONNNN'); });
   }
 
+  joinChannel(channelUrl: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      SBDGroupChannel.getChannelWithUrlCompletionHandler(channelUrl, (channel: SBDGroupChannel, err: SBDError) => {
+        if (err) {
+          reject(err);
+        }
+        channel.joinWithCompletionHandler((err: SBDError) => {
+          if (err) {
+            reject(err);
+          }
+
+          resolve();
+        })
+
+      });
+    });
+  }
+
   launchChannel(channelUrl: string) {
     const app = UIApplication.sharedApplication;
     const win = app.keyWindow || (app.windows && app.windows.count > 0 && app.windows.objectAtIndex(0));

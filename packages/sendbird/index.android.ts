@@ -31,7 +31,6 @@ class CreateChannel extends com.sendbird.android.OpenChannel.OpenChannelCreateHa
 		});
 	}
 }
-
 class EnterChannel extends com.sendbird.android.OpenChannel.OpenChannelGetHandler {
 	constructor(resolve, reject) {
 		super({
@@ -71,10 +70,10 @@ class SendMessage extends com.sendbird.android.OpenChannel.SendUserMessageHandle
 class MyChannelHandler extends com.sendbird.android.SendBird.ChannelHandler {
 	// constructor(resolve, reject) {}
 
-  onMessageReceived(channel, message) {
-    console.log('channel:', channel)
-    console.log('hello')
-  }
+	onMessageReceived(channel, message) {
+		console.log('channel:', channel);
+		console.log('hello');
+	}
 }
 
 class ChannelByUrl extends com.sendbird.android.OpenChannel.OpenChannelGetHandler {
@@ -91,27 +90,50 @@ class ChannelByUrl extends com.sendbird.android.OpenChannel.OpenChannelGetHandle
 }
 
 class GroupChannelTotalUnreadMessageCount extends com.sendbird.android.GroupChannel.GroupChannelTotalUnreadMessageCountHandler {
-  constructor(resolve, reject) {
-    super({
-      onResult(count, error) {
-        if (error != null) {
+	constructor(resolve, reject) {
+		super({
+			onResult(count, error) {
+				if (error != null) {
 					return reject({ error });
 				}
 				return resolve({ data: count });
-      }
-    })
-  }
+			},
+		});
+	}
 }
 
 class RegisterPushTokenHandler extends com.sendbird.android.SendBird.RegisterPushTokenWithStatusHandler {
-  constructor(resolve, reject) {
+	constructor(resolve, reject) {
+		super({
+			onRegistered: (status, exception) => {
+				if (exception) {
+					console.error('Failed to register device token: ' + exception);
+					reject(exception);
+				}
+				resolve();
+			},
+		});
+	}
+}
+
+class GroupChannelHandler extends com.sendbird.android.GroupChannel.GroupChannelGetHandler {
+	constructor(resolve, reject) {
+		super({
+			onResult(channel, error) {
+				if (error != null) {
+					return reject({ error });
+				}
+				return resolve(channel);
+			},
+		});
+	}
+}
+
+class JoinGroupChannelHandler extends com.sendbird.android.GroupChannel.GroupChannelJoinHandler {
+  constructor() {
     super({
-      onRegistered: (status, exception) => {
-        if (exception) {
-          console.error('Failed to register device token: ' + exception);
-          reject(exception);
-        }
-        resolve();
+      onResult(error) {
+        console.log('error:', error)
       }
     })
   }
@@ -123,7 +145,7 @@ export class Sendbird extends SendbirdCommon {
 
 	init(appId: string, userId: string, username: string, imageUrl: string) {
 		this.sendbird.init(appId, application.android.context);
-    this.sendbird.updateCurrentUserInfo(username, imageUrl, (() => {}) as any);
+		this.sendbird.updateCurrentUserInfo(username, imageUrl, (() => {}) as any);
 	}
 
 	connect(userId: string, nickname: string, profileUrl: string) {
@@ -172,9 +194,9 @@ export class Sendbird extends SendbirdCommon {
 
 	receiveMessage(channelUrl) {
 		return new Promise((resolve, reject) => {
-      console.log('receiveMessage')
+			console.log('receiveMessage');
 			const channelHandler = new MyChannelHandler();
-      console.log('receiveMessage1')
+			console.log('receiveMessage1');
 			this.sendbird.addChannelHandler('test', channelHandler);
 		});
 	}
@@ -186,88 +208,92 @@ export class Sendbird extends SendbirdCommon {
 		});
 	}
 
-  getTotalUnreadMessages() {
-    return new Promise((resolve, reject) => {
-      this.sendbird.getTotalUnreadMessageCount(new GroupChannelTotalUnreadMessageCount(resolve, reject));
-    })
-  }
+	getTotalUnreadMessages() {
+		return new Promise((resolve, reject) => {
+			this.sendbird.getTotalUnreadMessageCount(new GroupChannelTotalUnreadMessageCount(resolve, reject));
+		});
+	}
 
-  registerPushToken(token: string): Promise<void> {
-	  return new Promise((resolve, reject) => {
-      this.sendbird.registerPushTokenForCurrentUser(token, true, new RegisterPushTokenHandler(resolve, reject));
-    });
-  }
+	registerPushToken(token: string): Promise<void> {
+		return new Promise((resolve, reject) => {
+			this.sendbird.registerPushTokenForCurrentUser(token, true, new RegisterPushTokenHandler(resolve, reject));
+		});
+	}
+
+	async joinGroupChannel(channelUrl: string): Promise<void> {
+    console.log('JOIN GROUP CHANNEL')
+    const groupChannel: com.sendbird.android.GroupChannel = await new Promise((resolve, reject) => {
+      const groupChannelHandler = new GroupChannelHandler(resolve, reject);
+      com.sendbird.android.GroupChannel.getChannel(channelUrl, groupChannelHandler);
+    })
+    const joinGroupChannelHandler = new JoinGroupChannelHandler()
+    await groupChannel.join(joinGroupChannelHandler)
+	}
 }
 
 class UserInfo extends com.sendbird.uikit.interfaces.UserInfo {
-  constructor(userId: string, username: string, imageUrl: string) {
-    super({
-      getNickname() {
-        return username
-      },
-      getProfileUrl(): string {
-        return imageUrl
-      },
-      getUserId() {
-        return userId
-      }
-    })
-  }
+	constructor(userId: string, username: string, imageUrl: string) {
+		super({
+			getNickname() {
+				return username;
+			},
+			getProfileUrl(): string {
+				return imageUrl;
+			},
+			getUserId() {
+				return userId;
+			},
+		});
+	}
 }
 
 class SendBirdUIKitAdapter extends com.sendbird.uikit.adapter.SendBirdUIKitAdapter {
-  constructor(appId: string, userId: string, username: string, imageUrl: string) {
-    super({
-      getAccessToken(): string {
-        return ''
-      },
-      getAppId(): string {
-        return appId;
-      },
-      getUserInfo(): com.sendbird.uikit.interfaces.UserInfo {
-        return new UserInfo(userId, username, imageUrl);
-      }
-    })
-  }
+	constructor(appId: string, userId: string, username: string, imageUrl: string) {
+		super({
+			getAccessToken(): string {
+				return '';
+			},
+			getAppId(): string {
+				return appId;
+			},
+			getUserInfo(): com.sendbird.uikit.interfaces.UserInfo {
+				return new UserInfo(userId, username, imageUrl);
+			},
+		});
+	}
 }
 
 export class SendbirdUIKit {
-  sendbirdUIKit = com.sendbird.uikit.SendBirdUIKit;
-  init(appId: string, userId: string, username: string, imageUrl: string) {
-    var context = application.android.context;
-    this.sendbirdUIKit.init(new SendBirdUIKitAdapter(appId, userId, username, imageUrl), context);
-    // var intent = new android.content.Intent(context, (com as any).tns.MainActivity.class);
-    // let activity = application.android.foregroundActivity || application.android.startActivity;
-    // activity.startActivity(intent);
-  }
+	sendbirdUIKit = com.sendbird.uikit.SendBirdUIKit;
+	init(appId: string, userId: string, username: string, imageUrl: string) {
+		var context = application.android.context;
+		this.sendbirdUIKit.init(new SendBirdUIKitAdapter(appId, userId, username, imageUrl), context);
+		// var intent = new android.content.Intent(context, (com as any).tns.MainActivity.class);
+		// let activity = application.android.foregroundActivity || application.android.startActivity;
+		// activity.startActivity(intent);
+	}
 
-  launch() {
-    var context = application.android.context;
-    var intent = new android.content.Intent(context, (com as any).tns.CustomChannelListActivity.class);
-    let activity = application.android.foregroundActivity || application.android.startActivity;
-    activity.startActivity(intent);
-  }
+	launch() {
+		var context = application.android.context;
+		var intent = new android.content.Intent(context, (com as any).tns.CustomChannelListActivity.class);
+		let activity = application.android.foregroundActivity || application.android.startActivity;
+		activity.startActivity(intent);
+	}
 
-  joinChannel(channelUrl: string): Promise<void> {
-    return Promise.resolve();
-  }
+	launchChannel(channelUrl: string) {
+		const context = application.android.context;
+		const intent = com.sendbird.uikit.activities.ChannelActivity.newIntent(context, channelUrl);
+		const activity = application.android.foregroundActivity || application.android.startActivity;
+		activity.startActivity(intent);
+	}
 
-  launchChannel(channelUrl: string) {
-    const context = application.android.context;
-    const intent = com.sendbird.uikit.activities.ChannelActivity.newIntent(context, channelUrl);
-    const activity = application.android.foregroundActivity || application.android.startActivity;
-    activity.startActivity(intent);
-  }
+	setTheme(style: 'Light' | 'Dark'): void {
+		const theme = this.sendbirdUIKit.ThemeMode[style];
+		this.sendbirdUIKit.setDefaultThemeMode(theme);
+	}
 
-  setTheme(style: 'Light' | 'Dark'): void {
-    const theme = this.sendbirdUIKit.ThemeMode[style]
-    this.sendbirdUIKit.setDefaultThemeMode(theme)
-  }
-
-  customChannelPreview() {
-    // const channelListAdapter = new com.sendbird.uikit.activities.adapter.ChannelListAdapter.ChannelPreviewHolder(new android.view.View(application.android.context))
-    // channelListAdapter.bind()
-  }
+	customChannelPreview() {
+		// const channelListAdapter = new com.sendbird.uikit.activities.adapter.ChannelListAdapter.ChannelPreviewHolder(new android.view.View(application.android.context))
+		// channelListAdapter.bind()
+	}
 }
-
-

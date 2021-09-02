@@ -16,11 +16,13 @@ export declare class Sendbird extends SendbirdCommon {
   receiveMessages(channelUrl: string) {}
   leaveChannel(channelUrl: string) {}
   getTotalUnreadMessages(): Promise<{data: string}, {error: any}> {}
+  joinGroupChannel(channelUrl: string): void
 }
 
 export declare class SendbirdUIKit {
   init(appId: string, user: string, nickname: string, profileUrl: string): void {}
   launch(callback: dismissCallback): void {}
+  joinChannel(channelUrl: string): Promise<void>
   launchChannel(channelUrl: string);
   launchTabs(callback: dismissCallback, filters?: SendbirdFilters);
   setCurrentUser(userId: string, nickname: string, profileUrl: string);

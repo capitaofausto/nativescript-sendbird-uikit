@@ -13,7 +13,7 @@ export declare class Sendbird extends SendbirdCommon {
   receiveMessages(channelUrl: string) {}
   leaveChannel(channelUrl: string) {}
   getTotalUnreadMessages(): Promise<{data: string}, {error: any}> {}
-  joinGroupChannel(channelUrl: string): void
+  joinChannel(channelUrl: string): void
 }
 
 export declare class SendbirdUIKit {

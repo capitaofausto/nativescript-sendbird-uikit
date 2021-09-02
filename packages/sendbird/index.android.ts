@@ -133,7 +133,9 @@ class JoinGroupChannelHandler extends com.sendbird.android.GroupChannel.GroupCha
   constructor() {
     super({
       onResult(error) {
-        console.log('error:', error)
+        if(error) {
+          console.log('error:', error)
+        }
       }
     })
   }
@@ -220,8 +222,7 @@ export class Sendbird extends SendbirdCommon {
 		});
 	}
 
-	async joinGroupChannel(channelUrl: string): Promise<void> {
-    console.log('JOIN GROUP CHANNEL')
+	async joinChannel(channelUrl: string): Promise<void> {
     const groupChannel: com.sendbird.android.GroupChannel = await new Promise((resolve, reject) => {
       const groupChannelHandler = new GroupChannelHandler(resolve, reject);
       com.sendbird.android.GroupChannel.getChannel(channelUrl, groupChannelHandler);
@@ -275,6 +276,8 @@ export class SendbirdUIKit {
 
 	launch() {
 		var context = application.android.context;
+		// var intent = new android.content.Intent(context, (com as any).sendbird.CustomCreateChannelActivity.class);
+		// var intent = new android.content.Intent(context, (com as any).sendbird.TabViewActivity.class);
 		var intent = new android.content.Intent(context, (com as any).tns.CustomChannelListActivity.class);
 		let activity = application.android.foregroundActivity || application.android.startActivity;
 		activity.startActivity(intent);

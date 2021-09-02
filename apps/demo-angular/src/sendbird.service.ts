@@ -14,9 +14,9 @@ export class SendbirdService {
 
   init(user: string, nickname: string, profileUrl: string) {
     if(isIOS) {
-      this.sendbirdUIKit.init('1B1FEC58-BDF5-499E-832A-5C06E86EAD9C', user, nickname, profileUrl);
+      this.sendbirdUIKit.init('DA7C051A-70F5-42C4-83E9-7F47C8755C4B', user, nickname, profileUrl);
     } else {
-      this.sendbirdUIKit.init('1B1FEC58-BDF5-499E-832A-5C06E86EAD9C', user, nickname, profileUrl);
+      this.sendbirdUIKit.init('DA7C051A-70F5-42C4-83E9-7F47C8755C4B', user, nickname, profileUrl);
     }
   }
 
@@ -50,6 +50,15 @@ export class SendbirdService {
 
   receiveMessages(channelUrl: string) {
     return this.sendbird.receiveMessages(channelUrl);
+  }
+
+  joinChannel(channelUrl: string) {
+    console.log('channelUrl:', channelUrl)
+    return this.sendbird.joinChannel(channelUrl)
+  }
+
+  launchChannel(channelUrl: string) {
+    this.sendbirdUIKit.launchChannel(channelUrl)
   }
 
 }

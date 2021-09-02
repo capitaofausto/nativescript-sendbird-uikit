@@ -101,13 +101,6 @@
       <item name="sb_channel_preview_title_appearance">@style/SendbirdSubtitle1OnLight01</item>
     </style>
 
-    <style name="SendbirdSubtitle1OnLight01">
-      <item name="android:textStyle">bold</item>
-      <item name="android:letterSpacing">-0.01</item>
-      <item name="android:lineSpacingExtra">6sp</item>
-      <item name="android:textColor">@color/onlight_01</item>
-    </style>
-
     <!-- theme for action-bar -->
     <style name="NativeScriptToolbarStyleBase" parent="Widget.AppCompat.Toolbar">
         <item name="android:background">@color/ns_primary</item>
@@ -118,4 +111,21 @@
 
     <style name="NativeScriptToolbarStyle" parent="NativeScriptToolbarStyleBase">
     </style>
+
+    <style name="SendbirdCaption3OnDark01">
+      <item name="android:fontFamily">sans-serif</item>
+      <item name="android:textStyle">bold</item>
+      <item name="android:textSize">11sp</item>
+      <item name="android:lineSpacingExtra">1sp</item>
+      <item name="android:textColor">@color/ondark_01</item>
+    </style>
+
+    <style name="SendbirdCaption2Primary300">
+      <item name="android:fontFamily">sans-serif</item>
+      <item name="android:textStyle">normal</item>
+      <item name="android:textSize">12sp</item>
+      <item name="android:lineSpacingExtra">0sp</item>
+      <item name="android:textColor">@color/primary_300</item>
+    </style>
+
 </resources>

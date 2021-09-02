@@ -359,24 +359,24 @@ class MainChannelTabbarController extends UITabBarController {
     /* ALL SUPERGROUPS QUERY */
 
     /* ALL SUPERGROUPS QUERY */
-    const allSupergroupsViewController = new SupergroupChannelListViewController(null, this.filters, listQuery);
-    allSupergroupsViewController.titleView = UIView.new();
+    /* const allSupergroupsViewController = new SupergroupChannelListViewController(null, this.filters, listQuery);
+    allSupergroupsViewController.titleView = UIView.new(); */
 
     this.groupChannelsNavigationController = new UINavigationController({rootViewController: channelsViewController });
     this.myChatroomsNavigationController = new UINavigationController({rootViewController: mySupergroupsViewController });
-    this.allChatroomsNavigationController = new UINavigationController({rootViewController: allSupergroupsViewController });
+    /* this.allChatroomsNavigationController = new UINavigationController({rootViewController: allSupergroupsViewController }); */
 
-    let tabbarItems = [this.groupChannelsNavigationController, this.myChatroomsNavigationController, this.allChatroomsNavigationController];
+    let tabbarItems = [this.groupChannelsNavigationController, this.myChatroomsNavigationController/* , this.allChatroomsNavigationController */];
     this.viewControllers = tabbarItems;
 
-    this.setupStyles(channelsViewController, mySupergroupsViewController, allSupergroupsViewController);
+    this.setupStyles(channelsViewController, mySupergroupsViewController/* , allSupergroupsViewController */);
 
     SBDMain.addChannelDelegateIdentifier(this, 'Channel 1');
 
     // this.loadTotalUnreadMessageCount()
 	}
 
-  setupStyles(channelsViewController, mySupergroupsViewController, allSupergroupsViewController) {
+  setupStyles(channelsViewController, mySupergroupsViewController/* , allSupergroupsViewController */) {
     // this.theme = SBUTheme.componentTheme;
 
     this.tabBar.barTintColor =
@@ -393,9 +393,9 @@ class MainChannelTabbarController extends UITabBarController {
     mySupergroupsViewController.navigationItem.leftBarButtonItem = this.createLeftTitleItem("My Chatrooms");
     mySupergroupsViewController.tabBarItem = this.createTabItem("My chatrooms");
 
-    allSupergroupsViewController.leftBarButton = this.createLeftTitleItem("All chatrooms");
+    /* allSupergroupsViewController.leftBarButton = this.createLeftTitleItem("All chatrooms");
     allSupergroupsViewController.navigationItem.leftBarButtonItem = this.createLeftTitleItem("All Chatrooms");
-    allSupergroupsViewController.tabBarItem = this.createTabItem("All chatrooms");
+    allSupergroupsViewController.tabBarItem = this.createTabItem("All chatrooms"); */
 
     this.groupChannelsNavigationController.navigationBar.barStyle = this.isDarkMode
         ? UIColor.blackColor

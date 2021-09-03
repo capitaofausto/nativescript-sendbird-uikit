@@ -166,7 +166,11 @@ export class SendbirdUIKit {
     channelListTheme.navigationBarTintColor = color;
     SBUTheme.setChannelListTheme(channelListTheme);
     SBUStringSet.ChannelList_Header_Title = 'Chat';
-    SBUStringSet.Empty_No_Messages = "You haven't messaged this person yet\r\nPop them a line byt typing below";
+    SBUStringSet.CreateChannel_Header_Title = 'Start a chat';
+    SBUStringSet.Empty_No_Messages = "Send a message below to get the conversation going.";
+    SBUStringSet.ChannelSettings_Freeze_Channel = "Messages from hosts only";
+    SBUStringSet.MemberList_Title_Operators = "Hosts";
+    SBUStringSet.ChannelSettings_Operators = "Hosts";
     SBUIconSet.iconMessage = null;
     this.delegateUi = new ChannelListViewController(callback);
     this.delegateUi._owner = new WeakRef(this);

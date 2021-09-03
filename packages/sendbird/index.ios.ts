@@ -198,7 +198,7 @@ export class SendbirdUIKit {
     const win = app.keyWindow || (app.windows && app.windows.count > 0 && app.windows.objectAtIndex(0));
     let viewController = win.rootViewController;
 
-    const delegateUi = new SBUChannelViewController({channelUrl, messageListParams: null});
+    const delegateUi = new ChannelViewController(channelUrl);
     //this.delegateUi.initWithChannelUrlMessageListParams(channelUrl, null);
     //delegateUi._owner = new WeakRef(this);
 
@@ -227,6 +227,7 @@ class ChannelListViewController extends SBUChannelListViewController {
   public static ObjCExposedMethods = {
     viewDidLoad: { returns: interop.types.void, params: [] },
     onClickCreate: { returns: interop.types.void, params: [] },
+    tableViewDidSelectRowAtIndexPath: { returns: interop.types.void, params: [UITableView, NSIndexPath]}
 	};
 
   _owner: WeakRef<any>;
@@ -265,12 +266,126 @@ class ChannelListViewController extends SBUChannelListViewController {
   }
 
   onClickCreate() {
-    console.log('CREATE CHANNEL CLICKED');
+    if (this.createChannelTypeSelector != null) {
+      this.showCreateChannelTypeSelector();
+      return;
+    }
 
     const createChannelVC = CreateChannelViewController.newWithType(ChannelType.Group);
     // const createChannelVC = CreateChannelViewController.newWithType(ChannelType.Supergroup);
     this.navigationController.pushViewControllerAnimated(createChannelVC, true);
   }
+
+  tableViewDidSelectRowAtIndexPath(tableView: UITableView, indexPath: NSIndexPath) {
+    const channelUrl = this.channelList[indexPath.row].channelUrl;
+    const channelVC = new ChannelViewController(channelUrl);
+    this.navigationController.pushViewControllerAnimated(channelVC, true);
+  }
+}
+
+@NativeClass()
+class ChannelViewController extends SBUChannelViewController {
+
+  public static ObjCExposedMethods = {
+    onClickSetting: { returns: interop.types.void, params: [] }
+  };
+
+  constructor(channelUrl: string) {
+    super({channelUrl, messageListParams: null});
+  }
+
+  onClickSetting() {
+    if (!this.channel) {
+      return;
+    }
+
+    const channelVC = new ChannelSettingsViewController(this.channel);
+    this.navigationController.pushViewControllerAnimated(channelVC, true);
+  }
+
+}
+
+@NativeClass()
+class ChannelSettingsViewController extends SBUChannelSettingsViewController {
+
+  public static ObjCExposedMethods = {
+    tableViewDidSelectRowAtIndexPath: { returns: interop.types.void, params: [UITableView, NSIndexPath]}
+  };
+
+  constructor(channel: SBDGroupChannel) {
+    super({channel});
+  }
+
+  tableViewDidSelectRowAtIndexPath(tableView: UITableView, indexPath: NSIndexPath) {
+    console.log('-------------------');
+    console.log('--OVERRIDE WORKED at least for tableViewDidSelectRowAtIndexPath. GREAT SUCCESS!!!!--');
+    console.log('-------------------');
+
+    if (!this.userInfoView) {
+      return;
+    }
+
+    this.userInfoView.endEditing(true);
+
+    const rowValue = indexPath.row + (this.isOperator ? 0 : 1);
+    console.log('ROW value: ', rowValue);
+
+    if (rowValue === ChannelSettingItemType.Members) {
+      const memberListViewVC = new MemberListViewController(this.channel);
+      this.navigationController.pushViewControllerAnimated(memberListViewVC, true);
+    } else {
+      super.tableViewDidSelectRowAtIndexPath(tableView, indexPath);
+    }
+  }
+}
+
+@NativeClass()
+class MemberListViewController extends SBUMemberListViewController {
+
+  public static ObjCExposedMethods = {
+    onClickInviteUser: { returns: interop.types.void}
+  };
+
+  constructor(channel: SBDGroupChannel) {
+    super({channel, type: ChannelMemberListType.ChannelMembers});
+  }
+
+  onClickInviteUser() {
+    const channel = this.channel;
+    if (!(channel instanceof SBDGroupChannel)) {
+      return;
+    }
+
+    const type = this.memberListType === ChannelMemberListType.Operators ? ChannelInviteListType.Operators : ChannelInviteListType.Users;
+
+    const inviteUserVC = new InviteUserViewController(channel, type);
+    this.navigationController.pushViewControllerAnimated(inviteUserVC, true);
+  }
+}
+
+@NativeClass()
+class InviteUserViewController extends SBUInviteUserViewController {
+
+  public static ObjCExposedMethods = {
+    loadView: { returns: interop.types.void, params: [] },
+  };
+
+  constructor(channel: SBDGroupChannel, type: ChannelInviteListType) {
+    super({channel, type});
+  }
+
+  loadView() {
+    super.loadView();
+
+    const searchBar = UISearchBar.alloc().init();
+    searchBar.searchBarStyle = 0;
+    searchBar.placeholder = " Search...";
+    searchBar.sizeToFit();
+    searchBar.backgroundImage = UIImage.alloc().init();
+    searchBar.delegate = new UISearchBarDelegateImpl(this);
+    this.tableView.tableHeaderView = searchBar;
+  }
+
 }
 
 @NativeClass()
@@ -285,7 +400,6 @@ class CreateChannelViewController extends SBUCreateChannelViewController {
   }
 
   loadView() {
-    console.log('OVERRIDE: Load view overridden');
     super.loadView();
 
     const searchBar = UISearchBar.alloc().init();
@@ -302,13 +416,11 @@ class CreateChannelViewController extends SBUCreateChannelViewController {
 class UISearchBarDelegateImpl extends NSObject implements UISearchBarDelegate {
   public static ObjCProtocols = [UISearchBarDelegate];
 
-  constructor(private controller: CreateChannelViewController) {
+  constructor(private controller: CreateChannelViewController | InviteUserViewController) {
     super();
   }
 
   searchBarTextDidChange(searchBar: UISearchBar, searchText: string) {
-    console.log('SEARCH BAR TEXT CHANGED: ' + searchText);
-
     const listQuery = SBDMain.createApplicationUserListQuery();
     listQuery.nicknameStartsWithFilter = searchText;
     listQuery.loadNextPageWithCompletionHandler((data, error) => {

@@ -22,6 +22,7 @@ export declare class Sendbird extends SendbirdCommon {
 export declare class SendbirdUIKit {
   init(appId: string, user: string, nickname: string, profileUrl: string): void {}
   launch(callback: dismissCallback): void {}
+  createChannel(channelName: string, customType): Promise<{data: string}>
   joinChannel(channelUrl: string): Promise<void>
   launchChannel(channelUrl: string);
   launchTabs(callback: dismissCallback, filters?: SendbirdFilters);

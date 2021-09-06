@@ -179,6 +179,28 @@ export class SendbirdUIKit {
     Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(naviVC, true, () => { console.log('COMPLETIONNNN'); });
   }
 
+  createChannel(channelName: string, customType): Promise<{data: string}> {
+    return new Promise((resolve, reject) => {
+      let params = new SBDGroupChannelParams();
+      params.isSuper = true
+      params.isPublic = true
+      params.name = channelName;
+      params.customType = customType;
+      params.addUserId('faustino')
+
+      SBDGroupChannel.createChannelWithParamsCompletionHandler(params, (groupChannel, error) => {
+        let channelUrl = groupChannel?.channelUrl;
+        if(error) {
+          console.log('Sendbird Create channel Error');
+          reject(error);
+          return;
+        }
+        resolve({data: channelUrl})
+        // SUCCESS ON CREATION
+      })
+    })
+  }
+
   joinChannel(channelUrl: string): Promise<void> {
     return new Promise((resolve, reject) => {
       SBDGroupChannel.getChannelWithUrlCompletionHandler(channelUrl, (channel: SBDGroupChannel, err: SBDError) => {

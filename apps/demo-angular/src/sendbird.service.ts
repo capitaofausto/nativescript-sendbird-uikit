@@ -29,8 +29,8 @@ export class SendbirdService {
   }
 
   startUIKit() {
-    this.sendbirdUIKit.launch(() => {console.log('AQUIII na callback do dismiss');});
-    // this.sendbirdUIKit.launchTabs(() => {console.log('AQUIII na callback do dismiss');}, {fandom: ["swifties", "army"]});
+    // this.sendbirdUIKit.launch(() => {console.log('AQUIII na callback do dismiss');});
+    this.sendbirdUIKit.launchTabs(() => {console.log('AQUIII na callback do dismiss');}, { fandom: ["swifties", "army"] });
   }
 
   getTotalUnreadMessages() {
@@ -38,7 +38,7 @@ export class SendbirdService {
   }
 
   createChannel() {
-    return from(this.sendbird.createChannel());
+    return from(this.sendbirdUIKit.createChannel('swifties test 3', 'fandom_swifties'));
   }
 
   enterChannel(channelUrl: string) {

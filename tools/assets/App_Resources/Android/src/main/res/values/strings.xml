@@ -7,7 +7,7 @@
     <string name="sb_text_header_channel_settings">Channel information</string>
     <string name="sb_text_header_member_list">Members</string>
     <string name="sb_text_header_invite_member">Invite users</string>
-    <string name="sb_text_header_create_channel">New channel</string>
+    <string name="sb_text_header_create_channel">New Chat</string>
     <string name="sb_text_header_select_members">Select members</string>
     <string name="sb_text_header_participants">Participants</string>
     <string name="sb_text_header_participants_count">%s participants</string>
@@ -171,4 +171,7 @@
     <!-- Tabs -->
     <string name="text_tab_channels">Channels</string>
     <string name="text_tab_supergroups">Supergroups</string>
+
+    <string name="fandoms_dialog">Fandoms</string>
+
 </resources>

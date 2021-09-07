@@ -1,8 +1,9 @@
-package com.sendbird;
+package com.tns;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.content.Context;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -21,14 +22,18 @@ import com.sendbird.uikit.fragments.OpenChannelFragment;
 import com.sendbird.android.GroupChannel;
 import com.sendbird.android.GroupChannelListQuery;
 import com.sendbird.android.GroupChannelListQuery.PublicChannelFilter;
+import com.sendbird.android.GroupChannelListQuery.SuperChannelFilter;
 
+import com.sendbird.fragments.CustomChannelListFragment;
 import com.sendbird.CustomTabView;
 
+import com.tns.TabViewHandler;
 import java.util.Objects;
 
 public class TabViewActivity extends AppCompatActivity {
 
   private CustomTabView unreadCountTab;
+  private TabViewHandler handler;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -38,11 +43,15 @@ public class TabViewActivity extends AppCompatActivity {
   }
 
   private void initPage() {
+    Intent intent = getIntent();
+    String fandomsString = intent.getStringExtra("fandoms");
+    String[] fandoms = fandomsString.split(",");
     Toolbar toolbar = findViewById(R.id.tbMain);
     setSupportActionBar(toolbar);
 
     ViewPager mainPage = findViewById(R.id.vpMain);
-    mainPage.setAdapter(new MainAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT));
+    MainAdapter mainAdapter = new MainAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, fandoms);
+    mainPage.setAdapter(mainAdapter);
 
     TabLayout tabLayout = findViewById(R.id.tlMain);
     tabLayout.setupWithViewPager(mainPage);
@@ -60,27 +69,33 @@ public class TabViewActivity extends AppCompatActivity {
     Objects.requireNonNull(tabLayout.getTabAt(0)).setCustomView(unreadCountTab);
     Objects.requireNonNull(tabLayout.getTabAt(1)).setCustomView(settingsTab);
 
-    redirectChannelIfNeeded(getIntent());
+    redirectChannelIfNeeded(intent);
   }
 
   private class MainAdapter extends FragmentPagerAdapter {
     private static final int PAGE_SIZE = 2;
+    private String[] fandoms;
 
-    public MainAdapter(@NonNull FragmentManager fm, int behavior) {
+    public MainAdapter(@NonNull FragmentManager fm, int behavior, String[] fandoms) {
         super(fm, behavior);
+        this.fandoms = fandoms;
     }
 
     @NonNull
     @Override
     public Fragment getItem(int position) {
-      GroupChannelListQuery groupChannelsQuery = GroupChannel.createMyGroupChannelListQuery();
-      // GroupChannelListQuery superGroupChannelsQuery = GroupChannel.createMyGroupChannelListQuery();
-      groupChannelsQuery.setPublicChannelFilter(PublicChannelFilter.PUBLIC);
+      CustomChannelListFragment customFragmentInstance = new CustomChannelListFragment(this.fandoms);
+      GroupChannelListQuery privateGroupChannelsQuery = GroupChannel.createMyGroupChannelListQuery();
+      GroupChannelListQuery superGroupChannelsQuery = GroupChannel.createMyGroupChannelListQuery();
+      privateGroupChannelsQuery.setSuperChannelFilter(SuperChannelFilter.NONSUPER_CHANNEL_ONLY);
+      privateGroupChannelsQuery.setPublicChannelFilter(PublicChannelFilter.PRIVATE);
+      superGroupChannelsQuery.setPublicChannelFilter(PublicChannelFilter.PUBLIC);
+      superGroupChannelsQuery.setSuperChannelFilter(SuperChannelFilter.SUPER_CHANNEL_ONLY);
 
       if (position == 0) {
-          return new ChannelListFragment.Builder().setUseHeader(true).setGroupChannelListQuery(groupChannelsQuery).build();
+          return new ChannelListFragment.Builder().setCustomChannelListFragment(customFragmentInstance).setUseHeader(true).setGroupChannelListQuery(privateGroupChannelsQuery).build();
         } else {
-          return new ChannelListFragment.Builder().setUseHeader(true).setGroupChannelListQuery(groupChannelsQuery).build();
+          return new ChannelListFragment.Builder().setUseHeader(true).setGroupChannelListQuery(superGroupChannelsQuery).build();
         }
     }
 
@@ -88,6 +103,7 @@ public class TabViewActivity extends AppCompatActivity {
     public int getCount() {
         return PAGE_SIZE;
     }
+
   }
 
   private void redirectChannelIfNeeded(Intent intent) {

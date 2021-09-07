@@ -39,9 +39,9 @@
 		<activity android:name="com.tns.ErrorReportActivity"/>
     <activity android:name="com.tns.MainActivity">
     </activity>
-    <activity android:name="com.sendbird.TabViewActivity">
+    <activity android:name="com.tns.TabViewActivity">
     </activity>
-    <activity android:name="com.sendbird.CustomCreateChannelActivity">
+    <activity android:name="com.tns.CustomCreateChannelActivity">
     </activity>
 	</application>
 </manifest>

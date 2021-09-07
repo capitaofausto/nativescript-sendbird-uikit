@@ -1,4 +1,5 @@
 import { SendbirdCommon, APP_ID } from './common';
+import { Dialogs } from '@nativescript/core';
 import * as application from '@nativescript/core/application';
 import { OpenChannelParams } from './interfaces/channel';
 
@@ -130,15 +131,15 @@ class GroupChannelHandler extends com.sendbird.android.GroupChannel.GroupChannel
 }
 
 class JoinGroupChannelHandler extends com.sendbird.android.GroupChannel.GroupChannelJoinHandler {
-  constructor() {
-    super({
-      onResult(error) {
-        if(error) {
-          console.log('error:', error)
-        }
-      }
-    })
-  }
+	constructor() {
+		super({
+			onResult(error) {
+				if (error) {
+					console.log('error:', error);
+				}
+			},
+		});
+	}
 }
 
 export class Sendbird extends SendbirdCommon {
@@ -223,12 +224,12 @@ export class Sendbird extends SendbirdCommon {
 	}
 
 	async joinChannel(channelUrl: string): Promise<void> {
-    const groupChannel: com.sendbird.android.GroupChannel = await new Promise((resolve, reject) => {
-      const groupChannelHandler = new GroupChannelHandler(resolve, reject);
-      com.sendbird.android.GroupChannel.getChannel(channelUrl, groupChannelHandler);
-    })
-    const joinGroupChannelHandler = new JoinGroupChannelHandler()
-    await groupChannel.join(joinGroupChannelHandler)
+		const groupChannel: com.sendbird.android.GroupChannel = await new Promise((resolve, reject) => {
+			const groupChannelHandler = new GroupChannelHandler(resolve, reject);
+			com.sendbird.android.GroupChannel.getChannel(channelUrl, groupChannelHandler);
+		});
+		const joinGroupChannelHandler = new JoinGroupChannelHandler();
+		await groupChannel.join(joinGroupChannelHandler);
 	}
 }
 
@@ -264,6 +265,7 @@ class SendBirdUIKitAdapter extends com.sendbird.uikit.adapter.SendBirdUIKitAdapt
 	}
 }
 
+
 export class SendbirdUIKit {
 	sendbirdUIKit = com.sendbird.uikit.SendBirdUIKit;
 	init(appId: string, userId: string, username: string, imageUrl: string) {
@@ -275,10 +277,12 @@ export class SendbirdUIKit {
 	}
 
 	launch() {
+    const fandoms = Array.create("java.lang.String", 2);
+    fandoms[0] = "BTS";
+    fandoms[1] = "Swifties";
 		var context = application.android.context;
-		// var intent = new android.content.Intent(context, (com as any).sendbird.CustomCreateChannelActivity.class);
-		// var intent = new android.content.Intent(context, (com as any).sendbird.TabViewActivity.class);
-		var intent = new android.content.Intent(context, (com as any).tns.CustomChannelListActivity.class);
+    var intent = new android.content.Intent(context, (com as any).tns.TabViewActivity.class);
+    intent.putExtra("fandoms", "BTS,Swifties");
 		let activity = application.android.foregroundActivity || application.android.startActivity;
 		activity.startActivity(intent);
 	}
@@ -290,6 +294,15 @@ export class SendbirdUIKit {
 		activity.startActivity(intent);
 	}
 
+  createChannel() {
+    // const createChannel = new com.tns.CustomCreateChannelActivity(['joao', 'bento', 'manuel', 'faustino']);
+    // console.log('createChannel:', createChannel.getFandoms())
+    // var context = application.android.context;
+		// var intent = new android.content.Intent(context, (com as any).tns.CustomCreateChannelActivity.class);
+    // let activity = application.android.foregroundActivity || application.android.startActivity;
+		// activity.startActivity(intent);
+  }
+
 	setTheme(style: 'Light' | 'Dark'): void {
 		const theme = this.sendbirdUIKit.ThemeMode[style];
 		this.sendbirdUIKit.setDefaultThemeMode(theme);
@@ -298,5 +311,19 @@ export class SendbirdUIKit {
 	customChannelPreview() {
 		// const channelListAdapter = new com.sendbird.uikit.activities.adapter.ChannelListAdapter.ChannelPreviewHolder(new android.view.View(application.android.context))
 		// channelListAdapter.bind()
+	}
+
+	private fandomsDialog() {
+		const options = {
+			title: 'Race selection',
+			message: 'Are you sure you want to be a Unicorn?',
+			okButtonText: 'Yes',
+			cancelButtonText: 'No',
+			neutralButtonText: 'Cancel',
+		};
+
+		Dialogs.confirm(options).then((result: boolean) => {
+			console.log(result);
+		});
 	}
 }

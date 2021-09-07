@@ -17,13 +17,13 @@ export class SendbirdComponent {
 		/* this._page.on(Page.loadedEvent, () => {
     }) */
 		this.sendbirdService.startUIKit();
-		setTimeout(() => {
-			this.sendbirdService.getTotalUnreadMessages().subscribe((res: any) => {
-				console.log('SO PARA VER', res);
-				this.unreadCount = res.data;
-				this.cdr.detectChanges();
-			});
-		}, 500);
+		// setTimeout(() => {
+		// 	this.sendbirdService.getTotalUnreadMessages().subscribe((res: any) => {
+		// 		console.log('SO PARA VER', res);
+		// 		this.unreadCount = res.data;
+		// 		this.cdr.detectChanges();
+		// 	});
+		// }, 500);
 	}
 
 	start() {

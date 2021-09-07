@@ -1,6 +1,6 @@
 {
   "name": "@jbento/nativescript-sendbird",
-  "version": "1.0.17-beta.1",
+  "version": "1.0.17-beta.2",
   "description": "Integration of native Sendbird sdk and UiKit for Nativescript",
   "main": "index",
   "typings": "index.d.ts",

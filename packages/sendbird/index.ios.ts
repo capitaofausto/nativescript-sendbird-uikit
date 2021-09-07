@@ -186,7 +186,8 @@ export class SendbirdUIKit {
       params.isPublic = true
       params.name = channelName;
       params.customType = customType;
-      params.addUserId('faustino')
+      const currentUser = SBUGlobals.CurrentUser;
+      params.addUserId(currentUser.userId)
 
       SBDGroupChannel.createChannelWithParamsCompletionHandler(params, (groupChannel, error) => {
         let channelUrl = groupChannel?.channelUrl;
@@ -262,7 +263,7 @@ class ChannelListViewController extends SBUChannelListViewController {
   constructor(dismissCalback: dismissCallback) {
     let listQuery = SBDGroupChannel.createMyGroupChannelListQuery();
     listQuery.superChannelFilter = SBDGroupChannelSuperChannelFilter.NonSuper;
-    listQuery.includeEmptyChannel = false;
+    listQuery.includeEmptyChannel = true;
     /* listQuery.includeEmptyChannel = true;
     listQuery.includeFrozenChannel = true; */
     super({channelListQuery: listQuery});
@@ -476,7 +477,6 @@ class MainChannelTabbarController extends UITabBarController {
     super({coder: null});
     this.dismissCallback = dismissCalback;
     this.filters = filters;
-    debugger
   }
 
   static new(): MainChannelTabbarController {

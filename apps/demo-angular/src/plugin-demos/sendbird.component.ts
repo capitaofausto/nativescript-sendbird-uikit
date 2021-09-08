@@ -17,25 +17,26 @@ export class SendbirdComponent {
 		/* this._page.on(Page.loadedEvent, () => {
     }) */
 		// this.sendbirdService.startUIKit();
-		// setTimeout(() => {
-		// 	this.sendbirdService.getTotalUnreadMessages().subscribe((res: any) => {
-		// 		console.log('SO PARA VER', res);
-		// 		this.unreadCount = res.data;
-		// 		this.cdr.detectChanges();
-		// 	});
-		// }, 500);
+		setTimeout(() => {
+			this.sendbirdService.getTotalUnreadMessages().subscribe((res: any) => {
+				console.log('SO PARA VER', res);
+				this.unreadCount = res.data;
+				this.cdr.detectChanges();
+			});
+		}, 500);
 	}
 
-	lauchTabs() {
+	start() {
 		// this.sendbirdService.connect('6074541cecb19f6f8ef8c156', 'Joao Bento', 'https://res.cloudinary.com/quelleent/image/upload/ar_1,c_fill,q_90,w_100/v1/s3-assets/profile/678ed400-9b98-11eb-87e9-53e71f6a91e1.jpg');
-    const filters = {
-      fandom: ['army', 'swifties']
-    }
-    this.sendbirdService.launchTabs(filters)
-	}
+    this.sendbirdService.startUIKit();
+  }
 
-	launchCreateChannel() {
-		this.sendbirdService.launchCreateChannel('army');
+	createChannel() {
+    this.sendbirdService.createChannel().subscribe(res => {
+			this.channelUrl = res.data
+      this.sendbirdService.launchChannel(this.channelUrl);
+      console.log('CHANNEL', this.channelUrl);
+		})
 	}
 
   lauchJoinFandom() {

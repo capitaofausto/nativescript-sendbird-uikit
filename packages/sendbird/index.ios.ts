@@ -179,6 +179,29 @@ export class SendbirdUIKit {
     Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(naviVC, true, () => { console.log('COMPLETIONNNN'); });
   }
 
+  createChannel(channelName: string, customType): Promise<{data: string}> {
+    return new Promise((resolve, reject) => {
+      let params = new SBDGroupChannelParams();
+      params.isSuper = true
+      params.isPublic = true
+      params.name = channelName;
+      params.customType = customType;
+      const currentUser = SBUGlobals.CurrentUser;
+      params.addUserId(currentUser.userId)
+
+      SBDGroupChannel.createChannelWithParamsCompletionHandler(params, (groupChannel, error) => {
+        let channelUrl = groupChannel?.channelUrl;
+        if(error) {
+          console.log('Sendbird Create channel Error');
+          reject(error);
+          return;
+        }
+        resolve({data: channelUrl})
+        // SUCCESS ON CREATION
+      })
+    })
+  }
+
   joinChannel(channelUrl: string): Promise<void> {
     return new Promise((resolve, reject) => {
       SBDGroupChannel.getChannelWithUrlCompletionHandler(channelUrl, (channel: SBDGroupChannel, err: SBDError) => {
@@ -235,12 +258,13 @@ class ChannelListViewController extends SBUChannelListViewController {
 	};
 
   _owner: WeakRef<any>;
+  titleView: SBUNavigationTitleView;
   dismissCallback: dismissCallback;
 
   constructor(dismissCalback: dismissCallback) {
     let listQuery = SBDGroupChannel.createMyGroupChannelListQuery();
     listQuery.superChannelFilter = SBDGroupChannelSuperChannelFilter.NonSuper;
-    listQuery.includeEmptyChannel = false;
+    listQuery.includeEmptyChannel = true;
     /* listQuery.includeEmptyChannel = true;
     listQuery.includeFrozenChannel = true; */
     super({channelListQuery: listQuery});
@@ -454,7 +478,6 @@ class MainChannelTabbarController extends UITabBarController {
     super({coder: null});
     this.dismissCallback = dismissCalback;
     this.filters = filters;
-    debugger
   }
 
   static new(): MainChannelTabbarController {
@@ -473,7 +496,9 @@ class MainChannelTabbarController extends UITabBarController {
 
     const channelsViewController = new ChannelListViewController(null);
     // channelsViewController._owner = new WeakRef(this);
-    channelsViewController.titleView = UIView.new();
+    channelsViewController.titleView = SBUNavigationTitleView.new();
+    channelsViewController.titleView.text = "My chats";
+    channelsViewController.titleView.textAlignment = NSTextAlignment.Center;
 
     /* MY SUPERGROUPS QUERY */
     let listQuery = SBDGroupChannel.createMyGroupChannelListQuery();
@@ -489,7 +514,9 @@ class MainChannelTabbarController extends UITabBarController {
     /* MY SUPERGROUPS QUERY */
 
     const mySupergroupsViewController = new SupergroupChannelListViewController(null, this.filters, listQuery);
-    mySupergroupsViewController.titleView = UIView.new();
+    mySupergroupsViewController.titleView = SBUNavigationTitleView.new();
+    mySupergroupsViewController.titleView.text = "My chatrooms";
+    mySupergroupsViewController.titleView.textAlignment = NSTextAlignment.Center;
     /* ALL SUPERGROUPS QUERY */
 
     /* ALL SUPERGROUPS QUERY */
@@ -519,12 +546,9 @@ class MainChannelTabbarController extends UITabBarController {
         ? SBUColorSet.primary200
         : SBUColorSet.primary300
 
-    channelsViewController.leftBarButton = this.createLeftTitleItem("My Chats");
-    channelsViewController.navigationItem.leftBarButtonItem = this.createLeftTitleItem("My chats");
     channelsViewController.tabBarItem = this.createTabItem("My chats");
-
-    mySupergroupsViewController.leftBarButton = this.createLeftTitleItem("My Chatrooms");
-    mySupergroupsViewController.navigationItem.leftBarButtonItem = this.createLeftTitleItem("My Chatrooms");
+    // mySupergroupsViewController.leftBarButton = this.createLeftTitleItem("My Chatrooms");
+    // mySupergroupsViewController.navigationItem.leftBarButtonItem = this.createLeftTitleItem("My Chatrooms");
     mySupergroupsViewController.tabBarItem = this.createTabItem("My chatrooms");
 
     /* allSupergroupsViewController.leftBarButton = this.createLeftTitleItem("All chatrooms");
@@ -537,9 +561,9 @@ class MainChannelTabbarController extends UITabBarController {
     this.myChatroomsNavigationController.navigationBar.barStyle = this.isDarkMode
         ? UIColor.blackColor
         : UIColor.blueColor;
-    this.allChatroomsNavigationController.navigationBar.barStyle = this.isDarkMode
+    /* this.allChatroomsNavigationController.navigationBar.barStyle = this.isDarkMode
         ? UIColor.blackColor
-        : UIColor.blueColor;
+        : UIColor.blueColor; */
   }
 
   createLeftTitleItem(text: string): UIBarButtonItem {
@@ -605,6 +629,7 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
 
   _owner: WeakRef<any>;
   filters: SendbirdFilters;
+  titleView:SBUNavigationTitleView;
   dismissCallback: dismissCallback;
 
   constructor(dismissCalback: dismissCallback, filters: SendbirdFilters, listQuery: any) {

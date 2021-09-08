@@ -51,7 +51,6 @@ public class CustomChannelListFragment extends ChannelListFragment {
       } else if (this.channelType == CreateableChannelType.Super && fandoms.length == 1) {
         extraInfo.put("selectedFandom", fandoms[0]);
         this.channelNameDialog(this.channelType, extraInfo);
-        this.startCreateChannelActivity(this.channelType, extraInfo);
       } else if (this.channelType == CreateableChannelType.Super) {
         this.fandomsDialog(this.fandoms, this.channelType, extraInfo);
       }

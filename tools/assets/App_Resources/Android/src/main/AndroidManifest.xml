@@ -39,9 +39,11 @@
 		<activity android:name="com.tns.ErrorReportActivity"/>
     <activity android:name="com.tns.MainActivity">
     </activity>
-    <activity android:name="com.tns.TabViewActivity">
+    <activity android:name="com.tns.TabViewActivity" android:resource="@style/AppTheme" android:screenOrientation="portrait">
     </activity>
-    <activity android:name="com.tns.CustomCreateChannelActivity">
+    <activity
+      android:name="com.tns.CustomCreateChannelActivity"
+      >
     </activity>
 	</application>
 </manifest>

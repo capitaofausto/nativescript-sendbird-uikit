@@ -12,11 +12,14 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.annotation.NonNull;
 import androidx.viewpager.widget.ViewPager;
+import androidx.databinding.DataBindingUtil;
 
 import org.nativescript.plugindemoangular.R;
+import org.nativescript.plugindemoangular.databinding.ActivityMainBinding;
 
 import com.google.android.material.tabs.TabLayout;
 
+import com.sendbird.uikit.SendBirdUIKit;
 import com.sendbird.uikit.fragments.ChannelListFragment;
 import com.sendbird.uikit.fragments.OpenChannelFragment;
 import com.sendbird.uikit.consts.CreateableChannelType;
@@ -29,17 +32,18 @@ import com.sendbird.android.GroupChannelListQuery.SuperChannelFilter;
 import com.sendbird.fragments.CustomChannelListFragment;
 import com.sendbird.CustomTabView;
 
-import com.tns.TabViewHandler;
 import java.util.Objects;
 
 public class TabViewActivity extends AppCompatActivity {
 
-  private CustomTabView unreadCountTab;
-  private TabViewHandler handler;
+  private ActivityMainBinding binding;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
+      int themeResId = SendBirdUIKit.getDefaultThemeMode().getResId();
+      setTheme(themeResId);
+      // getSupportActionBar().hide();
       setContentView(R.layout.activity_main);
       initPage();
   }
@@ -48,9 +52,6 @@ public class TabViewActivity extends AppCompatActivity {
     Intent intent = getIntent();
     String fandomsString = intent.getStringExtra("fandoms");
     String[] fandoms = fandomsString.split(",");
-    Toolbar toolbar = findViewById(R.id.tbMain);
-    setSupportActionBar(toolbar);
-
     ViewPager mainPage = findViewById(R.id.vpMain);
     MainAdapter mainAdapter = new MainAdapter(getSupportFragmentManager(), FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT, fandoms);
     mainPage.setAdapter(mainAdapter);
@@ -58,18 +59,18 @@ public class TabViewActivity extends AppCompatActivity {
     TabLayout tabLayout = findViewById(R.id.tlMain);
     tabLayout.setupWithViewPager(mainPage);
 
-    unreadCountTab = new CustomTabView(this);
-    unreadCountTab.setBadgeVisibility(View.GONE);
-    unreadCountTab.setTitle(getString(R.string.text_tab_channels));
-    unreadCountTab.setIcon(R.drawable.icon_chat_filled);
+    CustomTabView publicGroupTab = new CustomTabView(this);
+    publicGroupTab.setBadgeVisibility(View.GONE);
+    publicGroupTab.setTitle(getString(R.string.text_tab_channels));
+    publicGroupTab.setIcon(R.drawable.icon_chat);
 
-    CustomTabView settingsTab = new CustomTabView(this);
-    settingsTab.setBadgeVisibility(View.GONE);
-    settingsTab.setTitle(getString(R.string.text_tab_supergroups));
-    settingsTab.setIcon(R.drawable.icon_chat_filled);
+    CustomTabView supergroupTab = new CustomTabView(this);
+    supergroupTab.setBadgeVisibility(View.GONE);
+    supergroupTab.setTitle(getString(R.string.text_tab_supergroups));
+    supergroupTab.setIcon(R.drawable.icon_supergroup);
 
-    Objects.requireNonNull(tabLayout.getTabAt(0)).setCustomView(unreadCountTab);
-    Objects.requireNonNull(tabLayout.getTabAt(1)).setCustomView(settingsTab);
+    Objects.requireNonNull(tabLayout.getTabAt(0)).setCustomView(publicGroupTab);
+    Objects.requireNonNull(tabLayout.getTabAt(1)).setCustomView(supergroupTab);
 
     redirectChannelIfNeeded(intent);
   }

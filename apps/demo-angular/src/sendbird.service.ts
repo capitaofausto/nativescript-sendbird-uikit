@@ -62,13 +62,6 @@ export class SendbirdService {
     this.sendbirdUIKit.launchTabs(undefined, filters)
   }
 
-  launchCreateChannel(fandom: string) {
-    const filters = {
-      fandom: [fandom]
-    }
-    this.sendbirdUIKit.launchCreateChannel(undefined, filters)
-  }
-
   launchChannel(channelUrl: string) {
     this.sendbirdUIKit.launchChannel(channelUrl)
   }

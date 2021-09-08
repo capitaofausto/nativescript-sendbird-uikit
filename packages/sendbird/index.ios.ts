@@ -165,13 +165,6 @@ export class SendbirdUIKit {
     let channelListTheme = SBUChannelListTheme.new();
     channelListTheme.navigationBarTintColor = color;
     SBUTheme.setChannelListTheme(channelListTheme);
-    SBUStringSet.ChannelList_Header_Title = 'Chat';
-    SBUStringSet.CreateChannel_Header_Title = 'Start a chat';
-    SBUStringSet.Empty_No_Messages = "Send a message below to get the conversation going.";
-    SBUStringSet.ChannelSettings_Freeze_Channel = "Messages from hosts only";
-    SBUStringSet.MemberList_Title_Operators = "Hosts";
-    SBUStringSet.ChannelSettings_Operators = "Hosts";
-    SBUIconSet.iconMessage = null;
     this.delegateUi = new ChannelListViewController(callback);
     this.delegateUi._owner = new WeakRef(this);
     let naviVC = new UINavigationController({ rootViewController: this.delegateUi });
@@ -281,8 +274,23 @@ class ChannelListViewController extends SBUChannelListViewController {
 		return delegate;
 	}
 
+  viewWillAppear() {
+    console.log('VIEW WILL APPEAR');
+    SBUStringSet.ChannelList_Header_Title = 'Chat';
+    SBUStringSet.CreateChannel_Header_Title = 'Start a chat';
+    SBUStringSet.Empty_No_Messages = "Send a message below to get the conversation going.";
+    SBUStringSet.ChannelSettings_Freeze_Channel = "Messages from hosts only";
+    SBUStringSet.MemberList_Title_Operators = "Hosts";
+    SBUStringSet.ChannelSettings_Operators = "Hosts";
+    SBUStringSet.ChannelSettings_Header_Title = "Chat information";
+    SBUStringSet.ChannelSettings_Leave = "Leave chat";
+    SBUStringSet.ChannelSettings_Change_Image = "Change chat image";
+    SBUIconSet.iconMessage = null;
+  }
+
   viewDidLoad() {
 		console.log('VIEW DID LOAD');
+
 		super.viewDidLoad();
 	}
 
@@ -655,6 +663,19 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
 		return delegate;
 	}
 
+  viewWillAppear() {
+    console.log('VIEW WILL APPEAR');
+    SBUStringSet.ChannelList_Header_Title = 'Chat';
+    SBUStringSet.CreateChannel_Header_Title = 'Start a chat';
+    SBUStringSet.Empty_No_Messages = "Invite more fans to join your chatroom with the (i) icon above!";
+    SBUStringSet.ChannelSettings_Freeze_Channel = "Messages from hosts only";
+    SBUStringSet.MemberList_Title_Operators = "Hosts";
+    SBUStringSet.ChannelSettings_Operators = "Hosts";
+    SBUStringSet.ChannelSettings_Header_Title = "Chatroom information";
+    SBUStringSet.ChannelSettings_Leave = "Leave chatroom";
+    SBUStringSet.ChannelSettings_Change_Image = "Change chatroom image";
+  }
+
   viewDidLoad() {
 		console.log('VIEW DID LOAD');
 		super.viewDidLoad();
@@ -678,13 +699,19 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
     }
   }
 
+  tableViewDidSelectRowAtIndexPath(tableView: UITableView, indexPath: NSIndexPath) {
+    const channelUrl = this.channelList[indexPath.row].channelUrl;
+    const channelVC = new ChannelViewController(channelUrl);
+    this.navigationController.pushViewControllerAnimated(channelVC, true);
+  }
+
   onClickCreate() {
     console.log('CREATE CHANNEL CLICKED');
 
     let options: PromptOptions = {
-      title: "Channel Name",
+      title: "Chatroom Name",
       defaultText: "",
-      message: "Enter channel name",
+      message: "Enter chatroom name",
       okButtonText: "Create",
       cancelButtonText: "Cancel",
       cancelable: true,
@@ -711,8 +738,8 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
             console.log(`SELLECTED ${fandom}`);
             let customType = `fandom_${fandom}`;
             prompt(options).then((result: PromptResult) => {
-              debugger
-              if(result.text) {
+              console.log(`WRITE ${result.text} ${result.result}`);
+              if(result.text && result.result) {
                 this.createChannel(result.text, customType);
               }
             });

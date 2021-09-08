@@ -1,4 +1,4 @@
-import { SendbirdCommon, APP_ID } from './common';
+import { SendbirdCommon, APP_ID, SendbirdFilters } from './common';
 import { Dialogs } from '@nativescript/core';
 import * as application from '@nativescript/core/application';
 import { OpenChannelParams } from './interfaces/channel';
@@ -277,12 +277,16 @@ export class SendbirdUIKit {
 	}
 
 	launch() {
-    const fandoms = Array.create("java.lang.String", 2);
-    fandoms[0] = "BTS";
-    fandoms[1] = "Swifties";
 		var context = application.android.context;
     var intent = new android.content.Intent(context, (com as any).tns.TabViewActivity.class);
-    intent.putExtra("fandoms", "BTS,Swifties");
+		let activity = application.android.foregroundActivity || application.android.startActivity;
+		activity.startActivity(intent);
+	}
+
+	launchTabs(cb: void, filters: SendbirdFilters) {
+		var context = application.android.context;
+    var intent = new android.content.Intent(context, (com as any).tns.TabViewActivity.class);
+    intent.putExtra("fandoms", filters.fandom.join(','));
 		let activity = application.android.foregroundActivity || application.android.startActivity;
 		activity.startActivity(intent);
 	}
@@ -294,13 +298,20 @@ export class SendbirdUIKit {
 		activity.startActivity(intent);
 	}
 
-  createChannel() {
-    // const createChannel = new com.tns.CustomCreateChannelActivity(['joao', 'bento', 'manuel', 'faustino']);
-    // console.log('createChannel:', createChannel.getFandoms())
-    // var context = application.android.context;
-		// var intent = new android.content.Intent(context, (com as any).tns.CustomCreateChannelActivity.class);
-    // let activity = application.android.foregroundActivity || application.android.startActivity;
-		// activity.startActivity(intent);
+  launchCreateChannel(cb: void, filters: SendbirdFilters) {
+    var context = application.android.context;
+    var intent = new android.content.Intent(context, (com as any).tns.CustomCreateChannelActivity.class);
+    intent.putExtra("fandoms", filters.fandom.join(','));
+		let activity = application.android.foregroundActivity || application.android.startActivity;
+		activity.startActivity(intent);
+  }
+
+  createChannel(fandoms: string[]) {
+		var context = application.android.context;
+    var intent = new android.content.Intent(context, (com as any).tns.TabViewActivity.class);
+    intent.putExtra("fandoms", fandoms.join(','));
+		let activity = application.android.foregroundActivity || application.android.startActivity;
+		activity.startActivity(intent);
   }
 
 	setTheme(style: 'Light' | 'Dark'): void {

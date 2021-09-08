@@ -58,8 +58,15 @@ export class SendbirdService {
     return this.sendbird.joinChannel(channelUrl)
   }
 
-  launchChannel(channelUrl: string) {
-    this.sendbirdUIKit.launchChannel(channelUrl)
+  launchTabs(filters) {
+    this.sendbirdUIKit.launchTabs(undefined, filters)
+  }
+
+  launchCreateChannel(fandom: string) {
+    const filters = {
+      fandom: [fandom]
+    }
+    this.sendbirdUIKit.launchCreateChannel(undefined, filters)
   }
 
 }

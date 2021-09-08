@@ -1,5 +1,4 @@
 package com.sendbird.fragments;
-
 import org.nativescript.plugindemoangular.R;
 
 import android.content.Intent;
@@ -27,10 +26,13 @@ public class CustomCreateChannelFragment extends CreateChannelFragment {
 
     @Override
     protected void onBeforeCreateGroupChannel(@NonNull GroupChannelParams params) {
-      toastError(R.string.sb_text_error_create_channel);
       super.onBeforeCreateGroupChannel(params);
       params.addUserIds(userIds);
-      params.setName(this.channelName);
-      params.setCustomType("fandom_"+this.selectedFandom);
+      if(this.channelName != null) {
+        params.setName(this.channelName);
+      }
+      if(this.selectedFandom != null) {
+        params.setCustomType("fandom_"+this.selectedFandom);
+      }
     }
 }

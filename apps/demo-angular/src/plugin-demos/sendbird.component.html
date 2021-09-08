@@ -2,10 +2,10 @@
 <StackLayout class="p-20">
 	<ScrollView class="h-full">
 		<StackLayout>
-			<Button text="start" (tap)="start()" class="btn btn-primary"></Button>
-			<Button text="Create Channel" (tap)="createChannel()" class="btn btn-primary"></Button>
-			<Button text="Enter Channel" (tap)="enterChannel()" class="btn btn-primary"></Button>
-			<Button text="Send Message" (tap)="sendMessage()" class="btn btn-primary"></Button>
+			<Button text="Launch Tabs" (tap)="lauchTabs()" class="btn btn-primary"></Button>
+			<Button text="Launch Create Channel" (tap)="launchCreateChannel()" class="btn btn-primary"></Button>
+			<Button text="Launch Join Fandom" (tap)="lauchPrivateMessage()" class="btn btn-primary"></Button>
+			<Button text="Launch Private" (tap)="lauchPrivateMessage()" class="btn btn-primary"></Button>
 			<!-- <Button text="Receive Message" (tap)="receiveMessages()" class="btn btn-primary"></Button> -->
       <Label textWrap="true" [text]="unreadCount ? unreadCount.toString() : '0'"></Label>
 		</StackLayout>

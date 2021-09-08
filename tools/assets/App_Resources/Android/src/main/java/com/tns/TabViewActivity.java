@@ -19,6 +19,8 @@ import com.google.android.material.tabs.TabLayout;
 
 import com.sendbird.uikit.fragments.ChannelListFragment;
 import com.sendbird.uikit.fragments.OpenChannelFragment;
+import com.sendbird.uikit.consts.CreateableChannelType;
+
 import com.sendbird.android.GroupChannel;
 import com.sendbird.android.GroupChannelListQuery;
 import com.sendbird.android.GroupChannelListQuery.PublicChannelFilter;
@@ -84,19 +86,32 @@ public class TabViewActivity extends AppCompatActivity {
     @NonNull
     @Override
     public Fragment getItem(int position) {
-      CustomChannelListFragment customFragmentInstance = new CustomChannelListFragment(this.fandoms);
+      CustomChannelListFragment customGroupFragmentInstance = new CustomChannelListFragment(this.fandoms, CreateableChannelType.Normal);
+      CustomChannelListFragment customSuperGroupFragmentInstance = new CustomChannelListFragment(this.fandoms, CreateableChannelType.Super);
       GroupChannelListQuery privateGroupChannelsQuery = GroupChannel.createMyGroupChannelListQuery();
       GroupChannelListQuery superGroupChannelsQuery = GroupChannel.createMyGroupChannelListQuery();
       privateGroupChannelsQuery.setSuperChannelFilter(SuperChannelFilter.NONSUPER_CHANNEL_ONLY);
       privateGroupChannelsQuery.setPublicChannelFilter(PublicChannelFilter.PRIVATE);
+      privateGroupChannelsQuery.setIncludeEmpty(true);
       superGroupChannelsQuery.setPublicChannelFilter(PublicChannelFilter.PUBLIC);
       superGroupChannelsQuery.setSuperChannelFilter(SuperChannelFilter.SUPER_CHANNEL_ONLY);
+      superGroupChannelsQuery.setIncludeEmpty(true);
 
       if (position == 0) {
-          return new ChannelListFragment.Builder().setCustomChannelListFragment(customFragmentInstance).setUseHeader(true).setGroupChannelListQuery(privateGroupChannelsQuery).build();
+        return new ChannelListFragment
+          .Builder()
+          .setCustomChannelListFragment(customGroupFragmentInstance)
+          .setUseHeader(true)
+          .setGroupChannelListQuery(privateGroupChannelsQuery)
+          .build();
         } else {
-          return new ChannelListFragment.Builder().setUseHeader(true).setGroupChannelListQuery(superGroupChannelsQuery).build();
-        }
+        return new ChannelListFragment
+          .Builder()
+          .setCustomChannelListFragment(customSuperGroupFragmentInstance)
+          .setUseHeader(true)
+          .setGroupChannelListQuery(superGroupChannelsQuery)
+          .build();
+      }
     }
 
     @Override

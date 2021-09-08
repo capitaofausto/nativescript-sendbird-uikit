@@ -158,7 +158,6 @@ public final class DialogUtils {
                 handler.shouldDismissLoadingDialog();
             }
             if (e != null) {
-                // ContextUtils.toastError(context, R.string.sb_text_error_create_channel);
                 Logger.e(e);
                 return;
             }

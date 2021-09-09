@@ -11,10 +11,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.app.Dialog;
 import android.app.AlertDialog;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.os.Bundle;
+import android.content.res.ColorStateList;
+import android.view.View;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentManager;
-
+import androidx.databinding.DataBindingUtil;
 
 import com.sendbird.uikit.activities.CreateChannelActivity;
 import com.sendbird.uikit.consts.CreateableChannelType;
@@ -23,6 +29,8 @@ import com.sendbird.uikit.model.DialogListItem;
 import com.sendbird.uikit.consts.DialogEditTextParams;
 import com.sendbird.uikit.interfaces.OnEditTextResultListener;
 import com.sendbird.uikit.activities.ChannelActivity;
+import com.sendbird.uikit.widgets.StatusFrameView;
+import com.sendbird.uikit.databinding.SbFragmentChannelListBinding;
 
 import com.tns.CustomCreateChannelActivity;
 
@@ -35,6 +43,7 @@ import com.sendbird.android.SendBirdException;
 
 public class CustomChannelListFragment extends ChannelListFragment {
 
+    private SbFragmentChannelListBinding binding;
     private String[] fandoms;
     private CreateableChannelType channelType;
     public CustomChannelListFragment(String[] fandoms, CreateableChannelType channelType) {
@@ -42,8 +51,19 @@ public class CustomChannelListFragment extends ChannelListFragment {
       this.channelType = channelType;
     }
 
+    // @Nullable
+    // @Override
+    // public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    //   super.onCreateView(inflater, container, savedInstanceState);
+    //   binding = DataBindingUtil.inflate(inflater, R.layout.sb_fragment_channel_list, container, false);
+    //   return binding.getRoot();
+    // }
+
     @Override
     protected void onSelectedChannelType(@NonNull CreateableChannelType channelType) {
+      Bundle args = getArguments();
+      // int emptyTextResId = args.getInt("HELLO", R.string.sb_text_channel_list_empty);
+      // binding.statusFrame.setEmptyText(emptyTextResId);
       String[] fandoms = this.fandoms;
       HashMap<String, String> extraInfo = new HashMap<String, String>();
       if(this.channelType == CreateableChannelType.Normal) {
@@ -84,13 +104,13 @@ public class CustomChannelListFragment extends ChannelListFragment {
           }
         }
       };
-      DialogEditTextParams params = new DialogEditTextParams(getString(R.string.sb_text_channel_settings_change_channel_name_hint));
+      DialogEditTextParams params = new DialogEditTextParams(getString(R.string.channel_name_dialog));
       params.setEnableSingleLine(true);
       DialogUtils.buildEditText(
-              getString(R.string.sb_text_channel_settings_change_channel_name_hint),
+              getString(R.string.channel_name_dialog_hint),
               (int) getResources().getDimension(R.dimen.sb_dialog_width_280),
               params, listener,
-              getString(R.string.sb_text_button_save), null,
+              getString(R.string.dialog_button_save), null,
               getString(R.string.sb_text_button_cancel), null).showSingle(getFragmentManager());
     }
 

@@ -170,8 +170,13 @@
 
     <!-- Tabs -->
     <string name="text_tab_channels">Channels</string>
-    <string name="text_tab_supergroups">Supergroups</string>
+    <string name="text_tab_supergroups">Chatrooms</string>
 
+    <!-- Dialogs -->
     <string name="fandoms_dialog">Fandoms</string>
+    <string name="channel_name_dialog">Chatroom</string>
+    <string name="channel_name_dialog_name">Enter chatroom name</string>
+    <string name="dialog_button_save">Create</string>
+    <string name="channel_name_dialog_hint">Create</string>
 
 </resources>

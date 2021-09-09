@@ -252,14 +252,14 @@ class ChannelListViewController extends SBUChannelListViewController {
 
   _owner: WeakRef<any>;
   titleView: SBUNavigationTitleView;
+  viewDidLoaded: boolean;
   dismissCallback: dismissCallback;
 
   constructor(dismissCalback: dismissCallback) {
     let listQuery = SBDGroupChannel.createMyGroupChannelListQuery();
     listQuery.superChannelFilter = SBDGroupChannelSuperChannelFilter.NonSuper;
     listQuery.includeEmptyChannel = true;
-    /* listQuery.includeEmptyChannel = true;
-    listQuery.includeFrozenChannel = true; */
+
     super({channelListQuery: listQuery});
     this.dismissCallback = dismissCalback;
   }
@@ -276,6 +276,12 @@ class ChannelListViewController extends SBUChannelListViewController {
 
   viewWillAppear() {
     console.log('VIEW WILL APPEAR');
+    /* if(this.viewDidLoaded) {
+      let listQuery = SBDGroupChannel.createMyGroupChannelListQuery();
+      listQuery.superChannelFilter = SBDGroupChannelSuperChannelFilter.NonSuper;
+      listQuery.includeEmptyChannel = true;
+      this.initWithChannelListQuery(listQuery);
+    } */
     SBUStringSet.ChannelList_Header_Title = 'Chat';
     SBUStringSet.CreateChannel_Header_Title = 'Start a chat';
     SBUStringSet.Empty_No_Messages = "Send a message below to get the conversation going.";
@@ -285,12 +291,16 @@ class ChannelListViewController extends SBUChannelListViewController {
     SBUStringSet.ChannelSettings_Header_Title = "Chat information";
     SBUStringSet.ChannelSettings_Leave = "Leave chat";
     SBUStringSet.ChannelSettings_Change_Image = "Change chat image";
+    SBUStringSet.ChannelSettings_Notifications = "Notifications (Coming Soon!)";
     SBUIconSet.iconMessage = null;
+    if(!this.viewDidLoaded) {
+      this.viewDidLoaded = true;
+    }
+    // super.viewWillAppear(true);
   }
 
   viewDidLoad() {
 		console.log('VIEW DID LOAD');
-
 		super.viewDidLoad();
 	}
 
@@ -345,12 +355,29 @@ class ChannelViewController extends SBUChannelViewController {
 class ChannelSettingsViewController extends SBUChannelSettingsViewController {
 
   public static ObjCExposedMethods = {
-    tableViewDidSelectRowAtIndexPath: { returns: interop.types.void, params: [UITableView, NSIndexPath]}
+    tableViewDidSelectRowAtIndexPath: { returns: interop.types.void, params: [UITableView, NSIndexPath]},
+    /* tableViewHeightForRowAtIndexPath: { returns: interop.types.uint32, params: [UITableView, NSIndexPath]} */
   };
 
   constructor(channel: SBDGroupChannel) {
     super({channel});
   }
+
+  loadView() {
+    // this.tableViewCellForRowAtIndexPath()
+    /* const cell = this.tableViewCellForRowAtIndexPath(this.tableView, new NSIndexPath({index: 0}))
+    cell.removeFromSuperview(); */
+    super.loadView();
+  }
+
+  /* tableViewHeightForRowAtIndexPath(tableView, indexPath) {
+    console.log('AQUIII', indexPath.row);
+    if(indexPath.row == 0) {
+      return 0.0;
+    } else {
+      return 60
+    }
+  } */
 
   tableViewDidSelectRowAtIndexPath(tableView: UITableView, indexPath: NSIndexPath) {
     console.log('-------------------');
@@ -637,7 +664,7 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
 
   _owner: WeakRef<any>;
   filters: SendbirdFilters;
-  titleView:SBUNavigationTitleView;
+  titleView: SBUNavigationTitleView;
   dismissCallback: dismissCallback;
 
   constructor(dismissCalback: dismissCallback, filters: SendbirdFilters, listQuery: any) {
@@ -674,6 +701,7 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
     SBUStringSet.ChannelSettings_Header_Title = "Chatroom information";
     SBUStringSet.ChannelSettings_Leave = "Leave chatroom";
     SBUStringSet.ChannelSettings_Change_Image = "Change chatroom image";
+    SBUStringSet.ChannelSettings_Notifications = "Notifications (Coming Soon!)";
   }
 
   viewDidLoad() {
@@ -729,7 +757,7 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
     if(fandomOptions.length > 1) {
       const actionItems = fandomOptions.map((fandom => {
         return new SBUActionSheetItem({
-          title: `${fandom.toUpperCase()} Fandom`,
+          title: `${fandom} Fandom`,
           color: null,
           image: null,
           font: null,
@@ -740,7 +768,7 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
             prompt(options).then((result: PromptResult) => {
               console.log(`WRITE ${result.text} ${result.result}`);
               if(result.text && result.result) {
-                this.createChannel(result.text, customType);
+                this.createChannel(result.text, customType.toLowerCase());
               }
             });
           }

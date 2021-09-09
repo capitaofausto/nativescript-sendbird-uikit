@@ -277,7 +277,7 @@ export class SendbirdUIKit {
 
 	launchChannel(channelUrl: string) {
 		const context = application.android.context;
-		const intent = com.sendbird.uikit.activities.ChannelActivity.newIntent(context, channelUrl);
+		const intent = (com as any).tns.CustomChannelActivity.newIntent(context, channelUrl);
 		const activity = application.android.foregroundActivity || application.android.startActivity;
 		activity.startActivity(intent);
 	}

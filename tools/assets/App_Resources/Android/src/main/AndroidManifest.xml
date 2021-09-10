@@ -39,9 +39,13 @@
 		<activity android:name="com.tns.ErrorReportActivity"/>
     <activity android:name="com.tns.MainActivity">
     </activity>
-    <activity android:name="com.sendbird.TabViewActivity">
+    <activity android:name="com.tns.TabViewActivity" android:resource="@style/AppTheme" android:screenOrientation="portrait">
     </activity>
-    <activity android:name="com.sendbird.CustomCreateChannelActivity">
-    </activity>
+    <activity android:name="com.tns.CustomChannelListActivity"/>
+    <activity android:name="com.tns.CustomCreateChannelActivity"/>
+    <activity android:name="com.tns.CustomChannelActivity"/>
+    <activity android:name="com.tns.CustomChannelSettingsActivity"/>
+    <activity android:name="com.tns.CustomMemberListActivity"/>
+    <activity android:name="com.tns.CustomInviteChannelActivity"/>
 	</application>
 </manifest>

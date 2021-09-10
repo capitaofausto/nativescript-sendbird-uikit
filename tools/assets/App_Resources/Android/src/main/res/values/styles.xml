@@ -22,7 +22,7 @@
     <!-- theme to use AFTER launch screen is loaded-->
     <style name="AppThemeBase" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="toolbarStyle">@style/NativeScriptToolbarStyle</item>
-
+        <item name="android:windowNoTitle">true</item>
         <item name="colorPrimary">@color/ns_primary</item>
         <item name="colorPrimaryDark">@color/ns_primaryDark</item>
         <item name="colorAccent">@color/ns_accent</item>
@@ -37,12 +37,12 @@
       <item name="sb_user_preview_style">@style/Widget.SendBird.UserPreview</item>
       <item name="sb_member_preview_style">@style/Widget.SendBird.MemberPreview</item>
       <item name="sb_channel_settings_style">@style/Widget.SendBird.ChannelSettings</item>
-      <item name="sb_channel_message_list_style">@style/Widget.SendBird.RecyclerView.Message</item>
-      <item name="sb_message_user_style">@style/Widget.SendBird.Message.User</item>
+      <item name="sb_channel_message_list_style">@style/Widget.SendBird.RecyclerView.Message.Custom</item>
+      <item name="sb_message_user_style">@style/Widget.SendBird.Message.User.Custom</item>
       <item name="sb_message_file_style">@style/Widget.SendBird.Message.File</item>
       <item name="sb_message_admin_style">@style/Widget.SendBird.Message.Admin</item>
       <item name="sb_message_timeline_style">@style/Widget.SendBird.Message.Timeline</item>
-      <item name="sb_message_input_style">@style/Widget.SendBird.MessageInput</item>
+      <item name="sb_message_input_style">@style/Widget.SendBird.MessageInput.Custom</item>
       <item name="sb_select_channel_type_style">@style/Widget.SendBird.SelectChannelTypeView</item>
       <item name="sb_appbar_style">@style/Widget.SendBird.AppBar.Custom</item>
       <item name="sb_recycler_view_style">@style/Widget.SendBird.RecyclerView</item>
@@ -87,19 +87,27 @@
       <item name="sb_message_input_style">CustomMessageInput</item>
     </style> -->
 
-    <style name="CustomMessageList" parent="Widget.SendBird.RecyclerView.Message">
-        <item name="sb_pager_recycler_view_use_divide_line">true</item>
-        <item name="sb_message_recyclerview_background">@drawable/splash_screen</item>
-        <item name="sb_message_recyclerview_tooltip_background">@color/error_500</item>
-        <item name="sb_message_recyclerview_tooltip_textappearance">@color/error_500</item>
-    </style>
     <!-- Custom Styles-->
     <style name="Widget.SendBird.AppBar.Custom" parent="Widget.SendBird.AppBar">
-      <item name="android:background">@color/header</item>
+      <item name="android:background">@color/light_purple</item>
     </style>
     <style name="Widget.SendBird.ChannelPreview.Custom" parent="Widget.SendBird.ChannelPreview">
       <item name="sb_channel_preview_title_appearance">@style/SendbirdSubtitle1OnLight01</item>
     </style>
+
+    <style name="Widget.SendBird.MessageInput.Custom" parent="Widget.SendBird.MessageInput">
+      <item name="sb_message_input_background">@color/light_purple</item>
+      <item name="sb_message_input_text_background">@drawable/sb_message_input_text_background_white</item>
+    </style>
+
+    <style name="Widget.SendBird.Message.User.Custom">
+      <item name="sb_message_me_background_tint">@color/light_purple</item>
+    </style>
+
+    <style name="Widget.SendBird.RecyclerView.Message.Custom">
+      <item name="sb_message_recyclerview_background">@color/background_50</item>
+    </style>
+
 
     <!-- theme for action-bar -->
     <style name="NativeScriptToolbarStyleBase" parent="Widget.AppCompat.Toolbar">
@@ -109,23 +117,13 @@
 
     </style>
 
-    <style name="NativeScriptToolbarStyle" parent="NativeScriptToolbarStyleBase">
-    </style>
-
-    <style name="SendbirdCaption3OnDark01">
-      <item name="android:fontFamily">sans-serif</item>
+    <style name="SendbirdSubtitle1OnLight01">
+      <item name="android:fontFamily">sans-serif-medium</item>
       <item name="android:textStyle">bold</item>
-      <item name="android:textSize">11sp</item>
-      <item name="android:lineSpacingExtra">1sp</item>
-      <item name="android:textColor">@color/ondark_01</item>
-    </style>
-
-    <style name="SendbirdCaption2Primary300">
-      <item name="android:fontFamily">sans-serif</item>
-      <item name="android:textStyle">normal</item>
-      <item name="android:textSize">12sp</item>
-      <item name="android:lineSpacingExtra">0sp</item>
-      <item name="android:textColor">@color/primary_300</item>
+      <item name="android:textSize">16sp</item>
+      <item name="android:letterSpacing">-0.01</item>
+      <item name="android:lineSpacingExtra">6sp</item>
+      <item name="android:textColor">@color/onlight_01</item>
     </style>
 
 </resources>

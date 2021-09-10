@@ -17,6 +17,7 @@ export class SendbirdComponent {
 		/* this._page.on(Page.loadedEvent, () => {
     }) */
 		// this.sendbirdService.startUIKit();
+    this.sendbirdService.connect('6074541cecb19f6f8ef8c156', 'Joao Bento', 'https://res.cloudinary.com/quelleent/image/upload/ar_1,c_fill,q_90,w_100/v1/s3-assets/profile/678ed400-9b98-11eb-87e9-53e71f6a91e1.jpg');
 		setTimeout(() => {
 			this.sendbirdService.getTotalUnreadMessages().subscribe((res: any) => {
 				console.log('SO PARA VER', res);
@@ -27,22 +28,21 @@ export class SendbirdComponent {
 	}
 
 	start() {
-		// this.sendbirdService.connect('6074541cecb19f6f8ef8c156', 'Joao Bento', 'https://res.cloudinary.com/quelleent/image/upload/ar_1,c_fill,q_90,w_100/v1/s3-assets/profile/678ed400-9b98-11eb-87e9-53e71f6a91e1.jpg');
     this.sendbirdService.startUIKit();
   }
 
-	createChannel() {
+
+  launchCreateChannel() {
     this.sendbirdService.createChannel().subscribe(res => {
 			this.channelUrl = res.data
       this.sendbirdService.launchChannel(this.channelUrl);
-      console.log('CHANNEL', this.channelUrl);
 		})
-	}
+  }
 
 	enterChannel() {
     const channelUrl = 'sendbird_group_channel_105358137_5f69506189e70d0029cbb2da2df7fae58b431f7a'
 		this.sendbirdService.joinChannel(channelUrl)
-    this.sendbirdService.launchChannel(channelUrl)
+    // this.sendbirdService.launchChannel(channelUrl)
 	}
 
 	sendMessage() {

@@ -1,4 +1,5 @@
-import { SendbirdCommon, APP_ID } from './common';
+import { SendbirdCommon, APP_ID, SendbirdFilters } from './common';
+import { Dialogs } from '@nativescript/core';
 import * as application from '@nativescript/core/application';
 import { OpenChannelParams } from './interfaces/channel';
 
@@ -17,16 +18,17 @@ class myConnectHandler extends com.sendbird.android.SendBird.ConnectHandler {
 	}
 }
 
-class CreateChannel extends com.sendbird.android.OpenChannel.OpenChannelCreateHandler {
+class GroupCreateChannelHandler extends com.sendbird.android.GroupChannel.GroupChannelCreateHandler {
 	constructor(resolve, reject) {
 		super({
-			onResult(openChannel: com.sendbird.android.OpenChannel, e: com.sendbird.android.SendBirdException) {
+			onResult(groupChannel: com.sendbird.android.GroupChannel, e: com.sendbird.android.SendBirdException) {
 				if (e != null) {
 					console.log('Sendbird Result Error');
+					console.log('e:', e)
 					return reject({ error: e });
 				}
 				console.log('Channel created');
-				return resolve({ data: openChannel });
+				return resolve({ data: groupChannel });
 			},
 		});
 	}
@@ -130,15 +132,15 @@ class GroupChannelHandler extends com.sendbird.android.GroupChannel.GroupChannel
 }
 
 class JoinGroupChannelHandler extends com.sendbird.android.GroupChannel.GroupChannelJoinHandler {
-  constructor() {
-    super({
-      onResult(error) {
-        if(error) {
-          console.log('error:', error)
-        }
-      }
-    })
-  }
+	constructor() {
+		super({
+			onResult(error) {
+				if (error) {
+					console.log('error:', error);
+				}
+			},
+		});
+	}
 }
 
 export class Sendbird extends SendbirdCommon {
@@ -155,23 +157,6 @@ export class Sendbird extends SendbirdCommon {
 			const handler = new myConnectHandler(resolve, reject);
 			this.sendbird.connect(userId, handler);
 		});
-	}
-
-	async createChannel(channelParams?: OpenChannelParams): Promise<{ data: com.sendbird.android.OpenChannel } | { error: com.sendbird.android.SendBirdException }> {
-		let channelOpts: com.sendbird.android.OpenChannelParams;
-		if (channelParams) {
-			channelOpts = new com.sendbird.android.OpenChannelParams().setName(channelParams.name).setCoverUrl(channelParams.coverUrl);
-		}
-		try {
-			const { data } = await new Promise((resolve, reject) => {
-				const channelHandler = new CreateChannel(resolve, reject);
-				channelOpts ? com.sendbird.android.OpenChannel.createChannel(channelOpts, channelHandler) : com.sendbird.android.OpenChannel.createChannel(channelHandler);
-			});
-			this.sendbirdChannel = data;
-			return { data: data.getUrl() };
-		} catch (error) {
-			return { error };
-		}
 	}
 
 	async enterChannel(channelUrl: string): Promise<{ data: string } | { error: com.sendbird.android.SendBirdException }> {
@@ -223,12 +208,12 @@ export class Sendbird extends SendbirdCommon {
 	}
 
 	async joinChannel(channelUrl: string): Promise<void> {
-    const groupChannel: com.sendbird.android.GroupChannel = await new Promise((resolve, reject) => {
-      const groupChannelHandler = new GroupChannelHandler(resolve, reject);
-      com.sendbird.android.GroupChannel.getChannel(channelUrl, groupChannelHandler);
-    })
-    const joinGroupChannelHandler = new JoinGroupChannelHandler()
-    await groupChannel.join(joinGroupChannelHandler)
+		const groupChannel: com.sendbird.android.GroupChannel = await new Promise((resolve, reject) => {
+			const groupChannelHandler = new GroupChannelHandler(resolve, reject);
+			com.sendbird.android.GroupChannel.getChannel(channelUrl, groupChannelHandler);
+		});
+		const joinGroupChannelHandler = new JoinGroupChannelHandler();
+		await groupChannel.join(joinGroupChannelHandler);
 	}
 }
 
@@ -264,6 +249,7 @@ class SendBirdUIKitAdapter extends com.sendbird.uikit.adapter.SendBirdUIKitAdapt
 	}
 }
 
+
 export class SendbirdUIKit {
 	sendbirdUIKit = com.sendbird.uikit.SendBirdUIKit;
 	init(appId: string, userId: string, username: string, imageUrl: string) {
@@ -276,18 +262,41 @@ export class SendbirdUIKit {
 
 	launch() {
 		var context = application.android.context;
-		// var intent = new android.content.Intent(context, (com as any).sendbird.CustomCreateChannelActivity.class);
-		// var intent = new android.content.Intent(context, (com as any).sendbird.TabViewActivity.class);
-		var intent = new android.content.Intent(context, (com as any).tns.CustomChannelListActivity.class);
+    var intent = new android.content.Intent(context, (com as any).tns.TabViewActivity.class);
+		let activity = application.android.foregroundActivity || application.android.startActivity;
+		activity.startActivity(intent);
+	}
+
+	launchTabs(cb: void, filters: SendbirdFilters) {
+		var context = application.android.context;
+    var intent = new android.content.Intent(context, (com as any).tns.TabViewActivity.class);
+    intent.putExtra("fandoms", filters.fandom.join(','));
 		let activity = application.android.foregroundActivity || application.android.startActivity;
 		activity.startActivity(intent);
 	}
 
 	launchChannel(channelUrl: string) {
 		const context = application.android.context;
-		const intent = com.sendbird.uikit.activities.ChannelActivity.newIntent(context, channelUrl);
+		const intent = (com as any).tns.CustomChannelActivity.newIntent(context, channelUrl);
 		const activity = application.android.foregroundActivity || application.android.startActivity;
 		activity.startActivity(intent);
+	}
+
+  async createChannel(channelName: string, customType: string): Promise<{ data: com.sendbird.android.OpenChannel } | { error: com.sendbird.android.SendBirdException }> {
+		let channelOpts: com.sendbird.android.GroupChannelParams;
+    channelOpts = new com.sendbird.android.GroupChannelParams().setName(channelName).setCustomType(customType).setPublic(true).setSuper(true);
+		try {
+			const { data } = await new Promise((resolve, reject) => {
+        const channelHandler = new GroupCreateChannelHandler(resolve, reject);
+        debugger
+				console.log('channelOpts:', channelOpts)
+				com.sendbird.android.GroupChannel.createChannel(channelOpts, channelHandler)
+			});
+			return { data: data.getUrl() };
+		} catch (error) {
+      debugger
+			return { error };
+		}
 	}
 
 	setTheme(style: 'Light' | 'Dark'): void {
@@ -298,5 +307,19 @@ export class SendbirdUIKit {
 	customChannelPreview() {
 		// const channelListAdapter = new com.sendbird.uikit.activities.adapter.ChannelListAdapter.ChannelPreviewHolder(new android.view.View(application.android.context))
 		// channelListAdapter.bind()
+	}
+
+	private fandomsDialog() {
+		const options = {
+			title: 'Race selection',
+			message: 'Are you sure you want to be a Unicorn?',
+			okButtonText: 'Yes',
+			cancelButtonText: 'No',
+			neutralButtonText: 'Cancel',
+		};
+
+		Dialogs.confirm(options).then((result: boolean) => {
+			console.log(result);
+		});
 	}
 }

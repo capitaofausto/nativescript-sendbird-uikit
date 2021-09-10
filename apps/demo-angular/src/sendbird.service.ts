@@ -58,6 +58,10 @@ export class SendbirdService {
     return this.sendbird.joinChannel(channelUrl)
   }
 
+  launchTabs(filters) {
+    this.sendbirdUIKit.launchTabs(undefined, filters)
+  }
+
   launchChannel(channelUrl: string) {
     this.sendbirdUIKit.launchChannel(channelUrl)
   }

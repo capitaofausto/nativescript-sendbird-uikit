@@ -26,7 +26,7 @@
   <color name="background_300">#bdbdbd</color>
   <color name="background_200">#e0e0e0</color>
   <color name="background_100">#eeeeee</color>
-  <color name="background_50">#ffffff</color>
+  <color name="white">#ffffff</color>
   <color name="overlay_01">#8c000000</color>
   <color name="overlay_02">#51000000</color>
   <color name="onlight_01">#e1000000</color>
@@ -38,5 +38,5 @@
   <color name="ondark_03">#61ffffff</color>
   <color name="ondark_04">#1effffff</color>
   <color name="information">#adc9ff</color>
-  <color name="header">#f7f5ff</color>
+  <color name="light_purple">#f7f5ff</color>
 </resources>

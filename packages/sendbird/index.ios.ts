@@ -796,7 +796,7 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
       prompt(options).then((result: PromptResult) => {
         if(result.text) {
           let customType = `fandom_${fandomOptions[0]}`;
-          this.createChannel(result.text, customType);
+          this.createChannel(result.text, customType.toLowerCase());
         }
       });
     }

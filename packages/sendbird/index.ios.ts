@@ -265,6 +265,7 @@ class ChannelListViewController extends SBUChannelListViewController {
     SBUStringSet.ChannelSettings_Leave = "Leave chat";
     SBUStringSet.ChannelSettings_Change_Image = "Change chat image";
     SBUStringSet.ChannelSettings_Notifications = "Notifications (Coming Soon!)";
+    SBUStringSet.Empty_No_Channels = "No chatrooms";
     SBUIconSet.iconMessage = null;
     if(!this.viewDidLoaded) {
       this.viewDidLoaded = true;
@@ -712,6 +713,7 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
     SBUStringSet.ChannelSettings_Leave = "Leave chatroom";
     SBUStringSet.ChannelSettings_Change_Image = "Change chatroom image";
     SBUStringSet.ChannelSettings_Notifications = "Notifications (Coming Soon!)";
+    SBUStringSet.Empty_No_Channels = "No chats";
   }
 
   viewDidLoad() {

@@ -554,7 +554,7 @@ class MainChannelTabbarController extends UITabBarController {
     let customFiltersArray = [];
     for (const key in this.filters) {
       if (Object.prototype.hasOwnProperty.call(this.filters, key)) {
-        customFiltersArray.push(...this.filters[key].map(value => `${key}_${value}`));
+        customFiltersArray.push(...this.filters[key].map(value => `${key}_${value.toLowerCase()}`));
       }
     }
     listQuery.customTypesFilter = new NSArray({array: customFiltersArray});

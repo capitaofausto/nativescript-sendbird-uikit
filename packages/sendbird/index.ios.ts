@@ -137,30 +137,6 @@ export class SendbirdUIKit {
     const app = UIApplication.sharedApplication;
     const win = app.keyWindow || (app.windows && app.windows.count > 0 && app.windows.objectAtIndex(0));
     let viewController = win.rootViewController;
-    // let channelTheme = new SBUChannelTheme({navigationBarTintColor: SBUColorSet.primary300});
-
-    /* let messageCellTheme = SBUMessageCellTheme(
-        backgroundColor: SBUColorSet.background100
-        ...
-    )
-
-    let messageInputTheme = SBUMessageInputTheme(
-        backgroundColor: SBUColorSet.background100
-        ...
-    )
-
-    SBUTheme.setChannel(channelTheme: channelTheme,
-            messageCellTheme: messageCellTheme,
-            messageInputTheme: messageInputTheme) */
-    // Channel theme.
-    /*  SBUTheme.channelTheme.backgroundColor = SBUColorSet.background100;
-
-    // Message cell theme.
-    SBUTheme.messageCellTheme.backgroundColor = SBUColorSet.background100;
-
-    // Message input theme.
-    SBUTheme.messageInputTheme.backgroundColor = SBUColorSet.background100; */
-    // SBUTheme.messageCellTheme.backgroundColor = SBUColorSet.background100;
     const color = new UIColor({red: 247 / 255.0, green: (245 / 255.0), blue: (255 / 255.0), alpha: 1});
     let channelListTheme = SBUChannelListTheme.new();
     channelListTheme.navigationBarTintColor = color;
@@ -233,9 +209,6 @@ export class SendbirdUIKit {
     let viewController = win.rootViewController;
     this.delegateTabsUi = new MainChannelTabbarController(callback, filters);
     this.delegateTabsUi._owner = new WeakRef(this);
-    const color = new UIColor({red: 247 / 255.0, green: (245 / 255.0), blue: (255 / 255.0), alpha: 1});
-    let channelListTheme = SBUChannelListTheme.new();
-    channelListTheme.navigationBarTintColor = color;
     //let naviVC = new UINavigationController({rootViewController: this.delegateTabsUi });
     this.delegateTabsUi.modalPresentationStyle = UIModalPresentationStyle.FullScreen;
     Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(this.delegateTabsUi, true, () => { console.log('COMPLETIONNNN'); });
@@ -292,6 +265,7 @@ class ChannelListViewController extends SBUChannelListViewController {
     SBUStringSet.ChannelSettings_Leave = "Leave chat";
     SBUStringSet.ChannelSettings_Change_Image = "Change chat image";
     SBUStringSet.ChannelSettings_Notifications = "Notifications (Coming Soon!)";
+    SBUStringSet.Empty_No_Channels = "No chatrooms";
     SBUIconSet.iconMessage = null;
     if(!this.viewDidLoaded) {
       this.viewDidLoaded = true;
@@ -302,7 +276,45 @@ class ChannelListViewController extends SBUChannelListViewController {
   viewDidLoad() {
 		console.log('VIEW DID LOAD');
 		super.viewDidLoad();
+    this.setupStyles();
+    this.setupStrings();
 	}
+
+  setupStyles() {
+    const color = new UIColor({red: 247 / 255.0, green: (245 / 255.0), blue: (255 / 255.0), alpha: 1});
+    let channelListTheme = SBUChannelListTheme.new();
+    let channelCellTheme = SBUChannelCellTheme.new();
+    channelListTheme.navigationBarTintColor = color;
+    channelCellTheme.titleFont = SBUFontSet.h2;
+    // channelCellTheme.titleTextColor = new UIColor({red: 247 / 255.0, green: (245 / 255.0), blue: (255 / 255.0), alpha: 1});
+    SBUTheme.setChannelListWithChannelListThemeChannelCellTheme(channelListTheme, channelCellTheme);
+    let messageChannelTheme = SBUMessageCellTheme.new();
+    let channelTheme = SBUChannelTheme.new();
+    let messageInputChannelTheme = SBUMessageInputTheme.new();
+    // channelTheme.channelStateBannerTextColor = SBUColorSet.error500;
+    channelTheme.navigationBarTintColor = color;
+    channelTheme.menuTextColor = SBUColorSet.error500;
+    messageChannelTheme.rightBackgroundColor = SBUColorSet.primary200;
+    messageChannelTheme.deliveryReceiptStateColor = SBUColorSet.primary100;
+    messageChannelTheme.readReceiptStateColor = SBUColorSet.primary100;
+    // messageChannelTheme.userMessageRightTextColor = SBUColorSet.error500;
+    // messageChannelTheme.backgroundColor = color;
+    messageInputChannelTheme.backgroundColor = color;
+    messageInputChannelTheme.textFieldBackgroundColor = new UIColor({red: 255, green: 255, blue: 255, alpha: 1});
+    SBUTheme.setChannelTheme(channelTheme);
+    SBUTheme.setMessageCellTheme(messageChannelTheme);
+    SBUTheme.setMessageInputTheme(messageInputChannelTheme);
+  }
+
+  setupStrings() {
+    SBUStringSet.ChannelList_Header_Title = 'Chat';
+    SBUStringSet.CreateChannel_Header_Title = 'Start a chat';
+    SBUStringSet.Empty_No_Messages = "Send a message below to get the conversation going.";
+    SBUStringSet.ChannelSettings_Freeze_Channel = "Messages from hosts only";
+    SBUStringSet.MemberList_Title_Operators = "Hosts";
+    SBUStringSet.ChannelSettings_Operators = "Hosts";
+    SBUIconSet.iconMessage = null;
+  }
 
   viewWillDisappear() {
 		super.viewWillDisappear(true);
@@ -542,7 +554,7 @@ class MainChannelTabbarController extends UITabBarController {
     let customFiltersArray = [];
     for (const key in this.filters) {
       if (Object.prototype.hasOwnProperty.call(this.filters, key)) {
-        customFiltersArray.push(...this.filters[key].map(value => `${key}_${value}`));
+        customFiltersArray.push(...this.filters[key].map(value => `${key}_${value.toLowerCase()}`));
       }
     }
     listQuery.customTypesFilter = new NSArray({array: customFiltersArray});
@@ -589,7 +601,6 @@ class MainChannelTabbarController extends UITabBarController {
     /* allSupergroupsViewController.leftBarButton = this.createLeftTitleItem("All chatrooms");
     allSupergroupsViewController.navigationItem.leftBarButtonItem = this.createLeftTitleItem("All Chatrooms");
     allSupergroupsViewController.tabBarItem = this.createTabItem("All chatrooms"); */
-
     this.groupChannelsNavigationController.navigationBar.barStyle = this.isDarkMode
         ? UIColor.blackColor
         : UIColor.blueColor;
@@ -702,6 +713,7 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
     SBUStringSet.ChannelSettings_Leave = "Leave chatroom";
     SBUStringSet.ChannelSettings_Change_Image = "Change chatroom image";
     SBUStringSet.ChannelSettings_Notifications = "Notifications (Coming Soon!)";
+    SBUStringSet.Empty_No_Channels = "No chats";
   }
 
   viewDidLoad() {

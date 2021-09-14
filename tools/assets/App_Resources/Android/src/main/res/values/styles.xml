@@ -61,17 +61,16 @@
       <item name="sb_open_channel_settings_style">@style/Widget.SendBird.OpenChannel.ChannelSettings</item>
     </style>
 
-
     <!-- Custom Styles-->
     <style name="Widget.SendBird.StatusFrame.Custom">
-        <item name="sb_status_frame_background">@color/background_50</item>
-        <item name="sb_status_frame_text_appearance">@style/SendbirdButtonPrimary300</item>
-        <item name="sb_status_frame_icon_tint">@color/onlight_03</item>
-        <!-- <item name="sb_status_frame_action_background">@drawable/selector_button_retry_light</item> -->
-        <item name="sb_status_frame_empty_icon">@null</item>
+      <item name="sb_status_frame_background">@color/background_50</item>
+      <item name="sb_status_frame_text_appearance">@style/SendbirdButtonPrimary300</item>
+      <item name="sb_status_frame_icon_tint">@color/onlight_03</item>
+      <item name="sb_status_frame_empty_icon">@null</item>
     </style>
     <style name="Widget.SendBird.AppBar.Custom" parent="Widget.SendBird.AppBar">
       <item name="android:background">@color/light_purple</item>
+      <item name="sb_appbar_right_button_text_appearance">@style/SendbirdCreateButton</item>
     </style>
     <style name="Widget.SendBird.ChannelPreview.Custom" parent="Widget.SendBird.ChannelPreview">
       <item name="sb_channel_preview_title_appearance">@style/SendbirdSubtitle1OnLight01</item>
@@ -80,11 +79,12 @@
     <style name="Widget.SendBird.MessageInput.Custom" parent="Widget.SendBird.MessageInput">
       <item name="sb_message_input_background">@color/light_purple</item>
       <item name="sb_message_input_text_background">@drawable/sb_message_input_text_background_white</item>
+      <item name="sb_message_input_background">@color/ondark_01</item>
     </style>
 
     <style name="Widget.SendBird.Message.User.Custom">
-      <item name="sb_message_me_background_tint">@color/light_purple</item>
       <item name="sb_message_me_text_appearance">@style/SendbirdBody3OnDark01</item>
+      <item name="sb_message_me_background_tint">@color/purple</item>
     </style>
 
     <style name="Widget.SendBird.RecyclerView.Message.Custom">
@@ -109,12 +109,20 @@
       <item name="android:textColor">@color/onlight_01</item>
     </style>
 
+    <style name="SendbirdCreateButton">
+      <item name="android:fontFamily">sans-serif</item>
+      <item name="android:textStyle">bold</item>
+      <item name="android:textSize">14sp</item>
+      <item name="android:letterSpacing">0.03</item>
+      <item name="android:lineSpacingExtra">2sp</item>
+    </style>
+
     <style name="SendbirdBody3OnDark01">
       <item name="android:fontFamily">sans-serif</item>
       <item name="android:textStyle">normal</item>
       <item name="android:textSize">14sp</item>
       <item name="android:lineSpacingExtra">6sp</item>
-      <item name="android:textColor">@color/ondark_01</item>
+      <item name="android:textColor">@color/black</item>
     </style>
 
 </resources>

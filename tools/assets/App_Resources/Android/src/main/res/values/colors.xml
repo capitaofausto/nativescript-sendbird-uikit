@@ -4,11 +4,11 @@
   <color name="ns_primaryDark">#757575</color>
   <color name="ns_accent">#33B5E5</color>
   <color name="ns_blue">#272734</color>
-  <color name="primary_500">#491389</color>
-  <color name="primary_400">#6211c8</color>
-  <color name="primary_300">#742ddd</color>
-  <color name="primary_200">#c2a9fa</color>
-  <color name="primary_100">#dbd1ff</color>
+  <color name="primary_500">#623DFF</color>
+  <color name="primary_400">#623DFF</color>
+  <color name="primary_300">#623DFF</color>
+  <color name="primary_200">#623DFF</color>
+  <color name="primary_100">#623DFF</color>
   <color name="secondary_500">#066858</color>
   <color name="secondary_400">#027d69</color>
   <color name="secondary_300">#259c72</color>
@@ -38,5 +38,7 @@
   <color name="ondark_03">#61ffffff</color>
   <color name="ondark_04">#1effffff</color>
   <color name="information">#adc9ff</color>
-  <color name="light_purple">#f7f5ff</color>
+  <color name="light_purple">#742DDD</color>
+  <color name="purple">#EFEAFF</color>
+  <color name="black">#000000</color>
 </resources>

@@ -33,6 +33,7 @@ import com.sendbird.uikit.widgets.StatusFrameView;
 import com.sendbird.uikit.databinding.SbFragmentChannelListBinding;
 
 import com.tns.CustomCreateChannelActivity;
+import com.tns.CustomChannelActivity;
 
 import com.sendbird.utils.DialogUtils;
 
@@ -144,7 +145,7 @@ public class CustomChannelListFragment extends ChannelListFragment {
     }
 
     private void startCreateChannelActivity(String channelUrl) {
-      Intent intent = ChannelActivity.newIntent(getContext(), channelUrl);
+      Intent intent = CustomChannelActivity.newIntent(getContext(), channelUrl);
       startActivity(intent);
     }
 }

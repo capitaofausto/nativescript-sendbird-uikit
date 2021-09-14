@@ -142,7 +142,7 @@
     <string name="sb_text_empty_no_muted_member">No muted members</string>
     <string name="sb_text_empty_no_banned_member">No banned members</string>
 
-    <string name="sb_text_button_selected">SELECTED</string>
+    <string name="sb_text_button_selected">Create</string>
     <string name="sb_text_button_add">ADD</string>
     <string name="sb_text_button_mute">MUTE</string>
     <string name="sb_text_button_ban">BAN</string>

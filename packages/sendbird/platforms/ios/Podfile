@@ -1,7 +1,7 @@
 platform :ios, '10.3'
 
 #ctarget 'demoangular' do
-    pod 'SendBirdUIKit'
+    pod 'SendBirdUIKit', '~> 2.1.12'
 # end
 post_install do |installer|
   installer.pods_project.build_configurations.each do |config|

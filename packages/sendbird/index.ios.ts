@@ -249,35 +249,14 @@ class ChannelListViewController extends SBUChannelListViewController {
 
   viewWillAppear() {
     console.log('VIEW WILL APPEAR');
-    /* if(this.viewDidLoaded) {
-      let listQuery = SBDGroupChannel.createMyGroupChannelListQuery();
-      listQuery.superChannelFilter = SBDGroupChannelSuperChannelFilter.NonSuper;
-      listQuery.includeEmptyChannel = true;
-      this.initWithChannelListQuery(listQuery);
-    } */
-    SBUStringSet.ChannelList_Header_Title = 'Chat';
-    SBUStringSet.CreateChannel_Header_Title = 'Start a chat';
-    SBUStringSet.Empty_No_Messages = "Send a message below to get the conversation going.";
-    SBUStringSet.ChannelSettings_Freeze_Channel = "Messages from hosts only";
-    SBUStringSet.MemberList_Title_Operators = "Hosts";
-    SBUStringSet.ChannelSettings_Operators = "Hosts";
-    SBUStringSet.ChannelSettings_Header_Title = "Chat information";
-    SBUStringSet.ChannelSettings_Leave = "Leave chat";
-    SBUStringSet.ChannelSettings_Change_Image = "Change chat image";
-    SBUStringSet.ChannelSettings_Notifications = "Notifications (Coming Soon!)";
-    SBUStringSet.Empty_No_Channels = "No chatrooms";
-    SBUIconSet.iconMessage = null;
-    if(!this.viewDidLoaded) {
-      this.viewDidLoaded = true;
-    }
-    // super.viewWillAppear(true);
+    this.setupStrings();
+    super.viewWillAppear(true);
   }
 
   viewDidLoad() {
 		console.log('VIEW DID LOAD');
 		super.viewDidLoad();
     this.setupStyles();
-    this.setupStrings();
 	}
 
   setupStyles() {
@@ -301,6 +280,13 @@ class ChannelListViewController extends SBUChannelListViewController {
     // messageChannelTheme.backgroundColor = color;
     messageInputChannelTheme.backgroundColor = color;
     messageInputChannelTheme.textFieldBackgroundColor = new UIColor({red: 255, green: 255, blue: 255, alpha: 1});
+
+    /* USER LIST */
+    /* let userListTheme = SBUUserListTheme.new();
+      userListTheme.backgroundColor = SBUColorSet.error500
+      SBUTheme.setUserListTheme(userListTheme);
+    */
+    /* USER LIST */
     SBUTheme.setChannelTheme(channelTheme);
     SBUTheme.setMessageCellTheme(messageChannelTheme);
     SBUTheme.setMessageInputTheme(messageInputChannelTheme);
@@ -313,6 +299,11 @@ class ChannelListViewController extends SBUChannelListViewController {
     SBUStringSet.ChannelSettings_Freeze_Channel = "Messages from hosts only";
     SBUStringSet.MemberList_Title_Operators = "Hosts";
     SBUStringSet.ChannelSettings_Operators = "Hosts";
+    SBUStringSet.ChannelSettings_Header_Title = "Chat information";
+    SBUStringSet.ChannelSettings_Leave = "Leave chat";
+    SBUStringSet.ChannelSettings_Change_Image = "Change chat image";
+    SBUStringSet.ChannelSettings_Notifications = "Notifications (Coming Soon!)";
+    SBUStringSet.Empty_No_Channels = "No chatrooms";
     SBUIconSet.iconMessage = null;
   }
 
@@ -703,17 +694,7 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
 
   viewWillAppear() {
     console.log('VIEW WILL APPEAR');
-    SBUStringSet.ChannelList_Header_Title = 'Chat';
-    SBUStringSet.CreateChannel_Header_Title = 'Start a chat';
-    SBUStringSet.Empty_No_Messages = "Invite more fans to join your chatroom with the (i) icon above!";
-    SBUStringSet.ChannelSettings_Freeze_Channel = "Messages from hosts only";
-    SBUStringSet.MemberList_Title_Operators = "Hosts";
-    SBUStringSet.ChannelSettings_Operators = "Hosts";
-    SBUStringSet.ChannelSettings_Header_Title = "Chatroom information";
-    SBUStringSet.ChannelSettings_Leave = "Leave chatroom";
-    SBUStringSet.ChannelSettings_Change_Image = "Change chatroom image";
-    SBUStringSet.ChannelSettings_Notifications = "Notifications (Coming Soon!)";
-    SBUStringSet.Empty_No_Channels = "No chats";
+    this.setupStrings();
   }
 
   viewDidLoad() {
@@ -731,6 +712,20 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
         // ...
     }) */
 	}
+
+  setupStrings() {
+    SBUStringSet.ChannelList_Header_Title = 'Chat';
+    SBUStringSet.CreateChannel_Header_Title = 'Start a chat';
+    SBUStringSet.Empty_No_Messages = "Invite more fans to join your chatroom with the (i) icon above!";
+    SBUStringSet.ChannelSettings_Freeze_Channel = "Messages from hosts only";
+    SBUStringSet.MemberList_Title_Operators = "Hosts";
+    SBUStringSet.ChannelSettings_Operators = "Hosts";
+    SBUStringSet.ChannelSettings_Header_Title = "Chatroom information";
+    SBUStringSet.ChannelSettings_Leave = "Leave chatroom";
+    SBUStringSet.ChannelSettings_Change_Image = "Change chatroom image";
+    SBUStringSet.ChannelSettings_Notifications = "Notifications (Coming Soon!)";
+    SBUStringSet.Empty_No_Channels = "No chats";
+  }
 
   viewWillDisappear() {
 		super.viewWillDisappear(true);
@@ -806,7 +801,7 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
       )
     } else if(fandomOptions.length === 1) {
       prompt(options).then((result: PromptResult) => {
-        if(result.text) {
+        if(result.text && result.result) {
           let customType = `fandom_${fandomOptions[0]}`;
           this.createChannel(result.text, customType.toLowerCase());
         }

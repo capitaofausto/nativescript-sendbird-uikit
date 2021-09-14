@@ -265,6 +265,7 @@ class ChannelListViewController extends SBUChannelListViewController {
     let channelCellTheme = SBUChannelCellTheme.new();
     channelListTheme.navigationBarTintColor = color;
     channelCellTheme.titleFont = SBUFontSet.h2;
+    // channelCellTheme.titleFont = UIFont.systemFontOfSizeWeight(20, 500);
     // channelCellTheme.titleTextColor = new UIColor({red: 247 / 255.0, green: (245 / 255.0), blue: (255 / 255.0), alpha: 1});
     SBUTheme.setChannelListWithChannelListThemeChannelCellTheme(channelListTheme, channelCellTheme);
     let messageChannelTheme = SBUMessageCellTheme.new();
@@ -273,23 +274,26 @@ class ChannelListViewController extends SBUChannelListViewController {
     // channelTheme.channelStateBannerTextColor = SBUColorSet.error500;
     channelTheme.navigationBarTintColor = color;
     channelTheme.menuTextColor = SBUColorSet.error500;
-    messageChannelTheme.rightBackgroundColor = SBUColorSet.primary200;
+    messageChannelTheme.rightBackgroundColor = new UIColor({red: 239 / 255.0, green: (234 / 255.0), blue: (255 / 255.0), alpha: 1});
+    messageChannelTheme.userMessageRightTextColor = new UIColor({red: 0, green: 0, blue: 0, alpha: 1});
     messageChannelTheme.deliveryReceiptStateColor = SBUColorSet.primary100;
     messageChannelTheme.readReceiptStateColor = SBUColorSet.primary100;
+    SBUIconSet.iconDone = UIImage.imageNamed("iconSent");
+    SBUIconSet.iconDoneAll = UIImage.imageNamed("iconDelivered");
     // messageChannelTheme.userMessageRightTextColor = SBUColorSet.error500;
     // messageChannelTheme.backgroundColor = color;
     messageInputChannelTheme.backgroundColor = color;
     messageInputChannelTheme.textFieldBackgroundColor = new UIColor({red: 255, green: 255, blue: 255, alpha: 1});
 
     /* USER LIST */
-    /* let userListTheme = SBUUserListTheme.new();
-      userListTheme.backgroundColor = SBUColorSet.error500
-      SBUTheme.setUserListTheme(userListTheme);
-    */
+    let userListTheme = SBUUserListTheme.new();
+    userListTheme.navigationBarTintColor = color;
+
     /* USER LIST */
     SBUTheme.setChannelTheme(channelTheme);
     SBUTheme.setMessageCellTheme(messageChannelTheme);
     SBUTheme.setMessageInputTheme(messageInputChannelTheme);
+    SBUTheme.setUserListTheme(userListTheme);
   }
 
   setupStrings() {
@@ -466,6 +470,11 @@ class CreateChannelViewController extends SBUCreateChannelViewController {
   }
 
   loadView() {
+    /* let titleLabel = UILabel.new();
+    titleLabel.text = 'Cancel';
+    titleLabel.font = UIFont.systemFontOfSizeWeight(16.0, UIFontWeightRegular);
+    titleLabel.textColor = SBUColorSet.primary500;
+    this.leftBarButton = new UIBarButtonItem({customView: titleLabel}).initWithPrimaryAction(); */
     super.loadView();
 
     const searchBar = UISearchBar.alloc().init();

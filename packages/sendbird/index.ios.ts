@@ -340,7 +340,9 @@ class ChannelListViewController extends SBUChannelListViewController {
 class ChannelViewController extends SBUChannelViewController {
 
   public static ObjCExposedMethods = {
-    onClickSetting: { returns: interop.types.void, params: [] }
+    onClickSetting: { returns: interop.types.void, params: [] },
+    viewDidLoad: { returns: interop.types.void, params: [] },
+    viewWillDisappear: { returns: interop.types.void, params: [] }
   };
 
   constructor(channelUrl: string) {
@@ -354,6 +356,69 @@ class ChannelViewController extends SBUChannelViewController {
 
     const channelVC = new ChannelSettingsViewController(this.channel);
     this.navigationController.pushViewControllerAnimated(channelVC, true);
+  }
+
+  viewDidLoad() {
+    this.setupStyles();
+    this.setupStrings();
+    super.viewDidLoad();
+  }
+
+  viewWillDisappear() {
+    SBDMain.removeChannelDelegateForIdentifier(this.description);
+    SBDMain.removeConnectionDelegateForIdentifier(this.description);
+    super.viewWillDisappear(true);
+  }
+
+  setupStyles() {
+    const color = new UIColor({red: 247 / 255.0, green: (245 / 255.0), blue: (255 / 255.0), alpha: 1});
+    let channelListTheme = SBUChannelListTheme.new();
+    let channelCellTheme = SBUChannelCellTheme.new();
+    channelListTheme.navigationBarTintColor = color;
+    channelCellTheme.titleFont = SBUFontSet.h2;
+    // channelCellTheme.titleFont = UIFont.systemFontOfSizeWeight(20, 500);
+    // channelCellTheme.titleTextColor = new UIColor({red: 247 / 255.0, green: (245 / 255.0), blue: (255 / 255.0), alpha: 1});
+    SBUTheme.setChannelListWithChannelListThemeChannelCellTheme(channelListTheme, channelCellTheme);
+    let messageChannelTheme = SBUMessageCellTheme.new();
+    let channelTheme = SBUChannelTheme.new();
+    let messageInputChannelTheme = SBUMessageInputTheme.new();
+    // channelTheme.channelStateBannerTextColor = SBUColorSet.error500;
+    channelTheme.navigationBarTintColor = color;
+    channelTheme.menuTextColor = SBUColorSet.error500;
+    messageChannelTheme.rightBackgroundColor = new UIColor({red: 239 / 255.0, green: (234 / 255.0), blue: (255 / 255.0), alpha: 1});
+    messageChannelTheme.userMessageRightTextColor = new UIColor({red: 0, green: 0, blue: 0, alpha: 1});
+    messageChannelTheme.deliveryReceiptStateColor = SBUColorSet.primary100;
+    messageChannelTheme.readReceiptStateColor = SBUColorSet.primary100;
+    SBUIconSet.iconDone = UIImage.imageNamed("iconSent");
+    SBUIconSet.iconDoneAll = UIImage.imageNamed("iconDelivered");
+    // messageChannelTheme.userMessageRightTextColor = SBUColorSet.error500;
+    // messageChannelTheme.backgroundColor = color;
+    messageInputChannelTheme.backgroundColor = color;
+    messageInputChannelTheme.textFieldBackgroundColor = new UIColor({red: 255, green: 255, blue: 255, alpha: 1});
+
+    /* USER LIST */
+    let userListTheme = SBUUserListTheme.new();
+    userListTheme.navigationBarTintColor = color;
+
+    /* USER LIST */
+    SBUTheme.setChannelTheme(channelTheme);
+    SBUTheme.setMessageCellTheme(messageChannelTheme);
+    SBUTheme.setMessageInputTheme(messageInputChannelTheme);
+    SBUTheme.setUserListTheme(userListTheme);
+  }
+
+  setupStrings() {
+    SBUStringSet.ChannelList_Header_Title = 'Chat';
+    SBUStringSet.CreateChannel_Header_Title = 'Start a chat';
+    SBUStringSet.Empty_No_Messages = "Invite more fans to join your chatroom with the (i) icon above!";
+    SBUStringSet.ChannelSettings_Freeze_Channel = "Messages from hosts only";
+    SBUStringSet.MemberList_Title_Operators = "Hosts";
+    SBUStringSet.ChannelSettings_Operators = "Hosts";
+    SBUStringSet.ChannelSettings_Header_Title = "Chatroom information";
+    SBUStringSet.ChannelSettings_Leave = "Leave chatroom";
+    SBUStringSet.ChannelSettings_Change_Image = "Change chatroom image";
+    SBUStringSet.ChannelSettings_Notifications = "Notifications (Coming Soon!)";
+    SBUStringSet.Empty_No_Channels = "No chats";
   }
 
 }
@@ -828,11 +893,8 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
 
     SBDGroupChannel.createChannelWithParamsCompletionHandler(params, (groupChannel, error) => {
       let channelUrl = groupChannel?.channelUrl;
-      SBUMain.openChannelWithChannelUrlBasedOnChannelListMessageListParams(
-        channelUrl,
-        false,
-        null
-      )
+      const channelVC = new ChannelViewController(channelUrl);
+      this.navigationController.pushViewControllerAnimated(channelVC, true);
       // SUCCESS ON CREATION
     })
 

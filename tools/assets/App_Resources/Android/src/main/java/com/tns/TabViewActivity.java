@@ -1,5 +1,7 @@
 package com.tns;
 
+import java.util.List;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -23,27 +25,37 @@ import com.sendbird.uikit.SendBirdUIKit;
 import com.sendbird.uikit.fragments.ChannelListFragment;
 import com.sendbird.uikit.fragments.OpenChannelFragment;
 import com.sendbird.uikit.consts.CreateableChannelType;
+import com.sendbird.uikit.utils.ContextUtils;
 
+import com.sendbird.android.User;
+import com.sendbird.android.GroupChannelTotalUnreadMessageCountParams;
+import com.sendbird.android.SendBird;
 import com.sendbird.android.GroupChannel;
 import com.sendbird.android.GroupChannelListQuery;
 import com.sendbird.android.GroupChannelListQuery.PublicChannelFilter;
 import com.sendbird.android.GroupChannelListQuery.SuperChannelFilter;
 
+
 import com.sendbird.fragments.CustomChannelListFragment;
 import com.sendbird.CustomTabView;
 
 import java.util.Objects;
+import java.util.Map;
 
 public class TabViewActivity extends AppCompatActivity {
 
+  private static final String USER_EVENT_HANDLER_KEY = "USER_EVENT_HANDLER_KEY" + System.currentTimeMillis();
   private ActivityMainBinding binding;
+  private CustomTabView publicGroupTab;
+  private CustomTabView supergroupTab;
+  private GroupChannelTotalUnreadMessageCountParams superGroupCountParams;
+  private GroupChannelTotalUnreadMessageCountParams groupCountParams;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       int themeResId = SendBirdUIKit.getDefaultThemeMode().getResId();
       setTheme(themeResId);
-      // getSupportActionBar().hide();
       setContentView(R.layout.activity_main);
       initPage();
   }
@@ -59,12 +71,12 @@ public class TabViewActivity extends AppCompatActivity {
     TabLayout tabLayout = findViewById(R.id.tlMain);
     tabLayout.setupWithViewPager(mainPage);
 
-    CustomTabView publicGroupTab = new CustomTabView(this);
+    publicGroupTab = new CustomTabView(this);
     publicGroupTab.setBadgeVisibility(View.GONE);
     publicGroupTab.setTitle(getString(R.string.text_tab_channels));
     publicGroupTab.setIcon(R.drawable.icon_chat);
 
-    CustomTabView supergroupTab = new CustomTabView(this);
+    supergroupTab = new CustomTabView(this);
     supergroupTab.setBadgeVisibility(View.GONE);
     supergroupTab.setTitle(getString(R.string.text_tab_supergroups));
     supergroupTab.setIcon(R.drawable.icon_supergroup);
@@ -73,6 +85,50 @@ public class TabViewActivity extends AppCompatActivity {
     Objects.requireNonNull(tabLayout.getTabAt(1)).setCustomView(supergroupTab);
 
     redirectChannelIfNeeded(intent);
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    groupCountParams = new GroupChannelTotalUnreadMessageCountParams();
+    superGroupCountParams = new GroupChannelTotalUnreadMessageCountParams();
+    groupCountParams = groupCountParams.setSuperChannelFilter(GroupChannelTotalUnreadMessageCountParams.SuperChannelFilter.NONSUPER_CHANNEL_ONLY);
+    superGroupCountParams = superGroupCountParams.setSuperChannelFilter(GroupChannelTotalUnreadMessageCountParams.SuperChannelFilter.SUPER_CHANNEL_ONLY);
+    getUnreadCountMessages(publicGroupTab, groupCountParams);
+    getUnreadCountMessages(supergroupTab, superGroupCountParams);
+  }
+
+  private void getUnreadCountMessages(CustomTabView tabView, GroupChannelTotalUnreadMessageCountParams countParams) {
+    SendBird.getTotalUnreadMessageCount(countParams, (totalCount, e) -> {
+      if (e != null) {
+        return;
+      }
+
+      if (totalCount > 0) {
+        tabView.setBadgeVisibility(View.VISIBLE);
+        tabView.setBadgeCount(totalCount > 99 ?
+          getString(R.string.text_tab_badge_max_count) :
+          String.valueOf(totalCount));
+      } else {
+          tabView.setBadgeVisibility(View.GONE);
+      }
+    });
+
+    // SendBird.addUserEventHandler(USER_EVENT_HANDLER_KEY, new SendBird.UserEventHandler() {
+    //     @Override
+    //     public void onFriendsDiscovered(List<User> list) {}
+
+    //     // @Override
+    //     // public void onTotalUnreadMessageCountChanged(int totalCount, Map<String, Integer> totalCountByCustomType) {
+    //     //   tabView.setBadgeVisibility(View.VISIBLE);
+    //     //   tabView.setBadgeCount(getString(R.string.text_tab_badge_max_count));
+    //     //           // String.valueOf(totalCount));
+    //     //     // if (totalCount > 0) {
+    //     //     // } else {
+    //     //     //     tabView.setBadgeVisibility(View.GONE);
+    //     //     // }
+    //     //   };
+    // });
   }
 
   private class MainAdapter extends FragmentPagerAdapter {

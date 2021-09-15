@@ -42,6 +42,7 @@
     <string name="sb_text_channel_unknown_type_text">(Unknown message type)\nCannot read this message.</string>
     <string name="sb_text_channel_reaction_count_max">99</string>
     <string name="sb_text_channel_message_empty">No messages</string>
+    <string name="text_tab_badge_max_count">99+</string>
 
     <!-- Channel Settings -->
     <string name="sb_text_channel_settings_moderations">Moderations</string>

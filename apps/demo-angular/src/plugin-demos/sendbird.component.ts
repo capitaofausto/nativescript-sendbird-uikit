@@ -24,7 +24,7 @@ export class SendbirdComponent {
 				this.unreadCount = res.data;
 				this.cdr.detectChanges();
 			});
-		}, 500);
+		}, 10000);
 	}
 
 	start() {

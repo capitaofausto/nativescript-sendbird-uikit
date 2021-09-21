@@ -14,7 +14,7 @@ export declare class Sendbird extends SendbirdCommon {
   receiveMessage(): Promise<any> {}
   getChannelByUrl(channelUrl: string): Promise<any> {}
   receiveMessages(channelUrl: string) {}
-  leaveChannel(channelUrl: string) {}
+  leaveChannel(channelUrl: string): Promise<{data: string}> {}
   getTotalUnreadMessages(): Promise<{data: string}, {error: any}> {}
   joinChannel(channelUrl: string): void
 }

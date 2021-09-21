@@ -86,8 +86,22 @@ export class Sendbird extends SendbirdCommon {
 		this.delegate.viewDidLoad();
   }
 
-  leaveChannel(channelUrl: string) {
-    SBDMain.removeChannelDelegateForIdentifier(channelUrl);
+  leaveChannel(channelUrl: string): Promise<{data: string} | {error: any}> {
+    // SBDMain.removeChannelDelegateForIdentifier(channelUrl);
+    return new Promise((resolve, reject) => {
+      SBDGroupChannel.getChannelWithUrlCompletionHandler(channelUrl, (groupChannel, error) => {
+        if(error) {
+          console.log('Sendbird enter channel Error');
+          reject(error)
+          return;
+        }
+        // Call the instance method of the result object in the "groupChannel" parameter of the callback method.
+        groupChannel?.leaveChannelWithCompletionHandler( (error) => {
+          console.log('Sendbird leave channel success');
+          resolve({ data: groupChannel.channelUrl });
+        })
+      })
+    })
   }
 
   getTotalUnreadMessages() {
@@ -218,6 +232,7 @@ export class SendbirdUIKit {
 class ChannelListViewController extends SBUChannelListViewController {
 
   public static ObjCExposedMethods = {
+    viewWillAppear: { returns: interop.types.void, params: [] },
     viewDidLoad: { returns: interop.types.void, params: [] },
     onClickCreate: { returns: interop.types.void, params: [] },
     tableViewDidSelectRowAtIndexPath: { returns: interop.types.void, params: [UITableView, NSIndexPath]}
@@ -248,9 +263,9 @@ class ChannelListViewController extends SBUChannelListViewController {
 	}
 
   viewWillAppear() {
-    console.log('VIEW WILL APPEAR');
+    console.log('VIEW WILL APPEAR CHAT');
     this.setupStrings();
-    super.viewWillAppear(true);
+    // super.viewWillAppear(true);
   }
 
   viewDidLoad() {
@@ -280,6 +295,7 @@ class ChannelListViewController extends SBUChannelListViewController {
     messageChannelTheme.readReceiptStateColor = SBUColorSet.primary100;
     SBUIconSet.iconDone = UIImage.imageNamed("iconSent");
     SBUIconSet.iconDoneAll = UIImage.imageNamed("iconDelivered");
+    SBUIconSet.iconInfo = UIImage.imageNamed("iconSettings");
     // messageChannelTheme.userMessageRightTextColor = SBUColorSet.error500;
     // messageChannelTheme.backgroundColor = color;
     messageInputChannelTheme.backgroundColor = color;
@@ -307,7 +323,7 @@ class ChannelListViewController extends SBUChannelListViewController {
     SBUStringSet.ChannelSettings_Leave = "Leave chat";
     SBUStringSet.ChannelSettings_Change_Image = "Change chat image";
     SBUStringSet.ChannelSettings_Notifications = "Notifications (Coming Soon!)";
-    SBUStringSet.Empty_No_Channels = "No chatrooms";
+    SBUStringSet.Empty_No_Channels = "No chats";
     SBUIconSet.iconMessage = null;
   }
 
@@ -391,6 +407,7 @@ class ChannelViewController extends SBUChannelViewController {
     messageChannelTheme.readReceiptStateColor = SBUColorSet.primary100;
     SBUIconSet.iconDone = UIImage.imageNamed("iconSent");
     SBUIconSet.iconDoneAll = UIImage.imageNamed("iconDelivered");
+    SBUIconSet.iconInfo = UIImage.imageNamed("iconSettings");
     // messageChannelTheme.userMessageRightTextColor = SBUColorSet.error500;
     // messageChannelTheme.backgroundColor = color;
     messageInputChannelTheme.backgroundColor = color;
@@ -728,12 +745,20 @@ class MainChannelTabbarController extends UITabBarController {
     return newImage!;
   }
 
+  viewWillDisappear() {
+		super.viewWillDisappear(true);
+    if(this.dismissCallback) {
+      this.dismissCallback();
+    }
+  }
+
 }
 
 @NativeClass()
 class SupergroupChannelListViewController extends SBUChannelListViewController implements SBUActionSheetDelegate {
   public static ObjCProtocols = [SBUActionSheetDelegate];
   public static ObjCExposedMethods = {
+    viewWillAppear: { returns: interop.types.void, params: [] },
     viewDidLoad: { returns: interop.types.void, params: [] },
     onClickCreate: { returns: interop.types.void, params: [] },
 	};
@@ -767,7 +792,7 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
 	}
 
   viewWillAppear() {
-    console.log('VIEW WILL APPEAR');
+    console.log('VIEW WILL APPEAR SUPER>');
     this.setupStrings();
   }
 
@@ -798,7 +823,7 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
     SBUStringSet.ChannelSettings_Leave = "Leave chatroom";
     SBUStringSet.ChannelSettings_Change_Image = "Change chatroom image";
     SBUStringSet.ChannelSettings_Notifications = "Notifications (Coming Soon!)";
-    SBUStringSet.Empty_No_Channels = "No chats";
+    SBUStringSet.Empty_No_Channels = "No chatrooms";
   }
 
   viewWillDisappear() {
@@ -816,18 +841,6 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
 
   onClickCreate() {
     console.log('CREATE CHANNEL CLICKED');
-
-    let options: PromptOptions = {
-      title: "Chatroom Name",
-      defaultText: "",
-      message: "Enter chatroom name",
-      okButtonText: "Create",
-      cancelButtonText: "Cancel",
-      cancelable: true,
-      inputType: inputType.text, // email, number, text, password, or email
-      capitalizationType: capitalizationType.sentences // all. none, sentences or words
-    };
-
     let fandomOptions = [];
     for (const key in this.filters) {
       if (Object.prototype.hasOwnProperty.call(this.filters, key) && key === 'fandom') {
@@ -846,9 +859,9 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
           completionHandler: () => {
             console.log(`SELLECTED ${fandom}`);
             let customType = `fandom_${fandom}`;
-            prompt(options).then((result: PromptResult) => {
+            this.showAlertName().then((result: PromptResult) => {
               console.log(`WRITE ${result.text} ${result.result}`);
-              if(result.text && result.result) {
+              if(result.text) {
                 this.createChannel(result.text, customType.toLowerCase());
               }
             });
@@ -874,14 +887,48 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
         this
       )
     } else if(fandomOptions.length === 1) {
-      prompt(options).then((result: PromptResult) => {
-        if(result.text && result.result) {
+      this.showAlertName().then((result: PromptResult) => {
+        if(result.text) {
           let customType = `fandom_${fandomOptions[0]}`;
           this.createChannel(result.text, customType.toLowerCase());
         }
       });
     }
 
+  }
+
+  showAlertName() {
+    return new Promise((resolve, reject) => {
+      var channelNameTextField: UITextField;
+
+      let alertController = UIAlertController.alertControllerWithTitleMessagePreferredStyle("Chatroom Name", "Enter chatroom name", UIAlertControllerStyle.Alert);
+
+      let createAction = UIAlertAction.actionWithTitleStyleHandler(
+      "Create", UIAlertActionStyle.Default,
+          (action) => {
+          if (channelNameTextField?.text) {
+            resolve({text: channelNameTextField?.text});
+          } else {
+            reject("No Username entered");
+          }
+      })
+      let cancelAction = UIAlertAction.actionWithTitleStyleHandler(
+        "Cancel", UIAlertActionStyle.Cancel, (action) => {reject();});
+
+      alertController.addTextFieldWithConfigurationHandler(
+          (txtUsername) => {
+            channelNameTextField = txtUsername;
+            channelNameTextField!.placeholder = "Chatroom name here";
+          }
+      );
+
+      alertController.addAction(createAction)
+      alertController.addAction(cancelAction)
+      const app = UIApplication.sharedApplication;
+      const win = app.keyWindow || (app.windows && app.windows.count > 0 && app.windows.objectAtIndex(0));
+      let viewController = win.rootViewController;
+      Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(alertController, true, () => { console.log('COMPLETIONNNN'); });
+    })
   }
 
   createChannel(channelName: string, customType) {

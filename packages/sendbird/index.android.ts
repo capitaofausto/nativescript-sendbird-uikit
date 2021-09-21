@@ -143,6 +143,18 @@ class JoinGroupChannelHandler extends com.sendbird.android.GroupChannel.GroupCha
 	}
 }
 
+class LeaveGroupChannelHandler extends com.sendbird.android.GroupChannel.GroupChannelLeaveHandler {
+	constructor() {
+		super({
+			onResult(error) {
+				if (error) {
+					console.log('error:', error);
+				}
+			},
+		});
+	}
+}
+
 export class Sendbird extends SendbirdCommon {
 	private sendbird = com.sendbird.android.SendBird;
 	private sendbirdChannel: com.sendbird.android.OpenChannel;
@@ -214,6 +226,15 @@ export class Sendbird extends SendbirdCommon {
 		});
 		const joinGroupChannelHandler = new JoinGroupChannelHandler();
 		await groupChannel.join(joinGroupChannelHandler);
+	}
+
+  async leaveChannel(channelUrl: string): Promise<void> {
+		const groupChannel: com.sendbird.android.GroupChannel = await new Promise((resolve, reject) => {
+			const groupChannelHandler = new GroupChannelHandler(resolve, reject);
+			com.sendbird.android.GroupChannel.getChannel(channelUrl, groupChannelHandler);
+		});
+		const leaveGroupChannelHandler = new LeaveGroupChannelHandler();
+		await groupChannel.leave(leaveGroupChannelHandler);
 	}
 }
 

@@ -63,7 +63,11 @@ export class SendbirdService {
   }
 
   launchChannel(channelUrl: string) {
-    this.sendbirdUIKit.launchChannel(channelUrl)
+    this.sendbirdUIKit.launchChannel(channelUrl);
+  }
+
+  leaveChannel(channelUrl: string) {
+    return from(this.sendbird.leaveChannel(channelUrl));
   }
 
 }

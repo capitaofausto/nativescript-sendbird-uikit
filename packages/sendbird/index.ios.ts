@@ -264,6 +264,12 @@ class ChannelListViewController extends SBUChannelListViewController {
 
   viewWillAppear() {
     console.log('VIEW WILL APPEAR CHAT');
+    const paramsChat = SBDGroupChannelTotalUnreadMessageCountParams.new();
+    // params.channelCustomTypesFilter = ['fandom_army'];
+    paramsChat.superChannelFilter = SBDGroupChannelSuperChannelFilter.NonSuper;
+    SBDMain.getTotalUnreadMessageCountWithParamsCompletionHandler(paramsChat, (totalCount, error) => {
+        this.setUnreadMessagesCount(this, totalCount);
+    })
     this.setupStrings();
     // super.viewWillAppear(true);
   }
@@ -273,6 +279,29 @@ class ChannelListViewController extends SBUChannelListViewController {
 		super.viewDidLoad();
     this.setupStyles();
 	}
+
+  setUnreadMessagesCount(viewController, totalCount: number) {
+    let badgeValue: String;
+
+    if (totalCount == 0) {
+        badgeValue = null;
+    } else if (totalCount > 99) {
+        badgeValue = "99+";
+    } else {
+        badgeValue = `${totalCount}`;
+    }
+
+    viewController.tabBarItem.badgeColor = SBUColorSet.error300
+    viewController.tabBarItem.badgeValue = badgeValue
+    viewController.tabBarItem.setBadgeTextAttributesForState(
+        {
+          [NSForegroundColorAttributeName] : SBUColorSet.ondark01,
+          [NSFontAttributeName] : SBUFontSet.caption4
+        },
+        UIControlState.Normal
+    )
+
+  }
 
   setupStyles() {
     const color = new UIColor({red: 247 / 255.0, green: (245 / 255.0), blue: (255 / 255.0), alpha: 1});
@@ -593,8 +622,17 @@ class UISearchBarDelegateImpl extends NSObject implements UISearchBarDelegate {
 @NativeClass()
 class MainChannelTabbarController extends UITabBarController {
 
+  /* public static ObjCProtocols = [SBDUserEventDelegate];
+
+
+  public static ObjCExposedMethods = {
+    didUpdateTotalUnreadMessageCountTotalCountByCustomType: { returns: interop.types.void, params: [interop.types.uint32, NSDictionary]},
+  }; */
+
   groupChannelsNavigationController;
+  channelsViewController;
   myChatroomsNavigationController;
+  chatroomsViewController;
   allChatroomsNavigationController;
   viewControllers;
 
@@ -629,6 +667,8 @@ class MainChannelTabbarController extends UITabBarController {
     channelsViewController.titleView.text = "My chats";
     channelsViewController.titleView.textAlignment = NSTextAlignment.Center;
 
+    this.channelsViewController = channelsViewController;
+
     /* MY SUPERGROUPS QUERY */
     let listQuery = SBDGroupChannel.createMyGroupChannelListQuery();
     listQuery.superChannelFilter = SBDGroupChannelSuperChannelFilter.Super;
@@ -646,6 +686,7 @@ class MainChannelTabbarController extends UITabBarController {
     mySupergroupsViewController.titleView = SBUNavigationTitleView.new();
     mySupergroupsViewController.titleView.text = "My chatrooms";
     mySupergroupsViewController.titleView.textAlignment = NSTextAlignment.Center;
+    this.chatroomsViewController = mySupergroupsViewController;
     /* ALL SUPERGROUPS QUERY */
 
     /* ALL SUPERGROUPS QUERY */
@@ -663,7 +704,7 @@ class MainChannelTabbarController extends UITabBarController {
 
     SBDMain.addChannelDelegateIdentifier(this, 'Channel 1');
 
-    // this.loadTotalUnreadMessageCount()
+    this.loadTotalUnreadMessageCount()
 	}
 
   setupStyles(channelsViewController, mySupergroupsViewController/* , allSupergroupsViewController */) {
@@ -752,6 +793,46 @@ class MainChannelTabbarController extends UITabBarController {
     }
   }
 
+  loadTotalUnreadMessageCount() {
+    const paramsChat = SBDGroupChannelTotalUnreadMessageCountParams.new();
+    // params.channelCustomTypesFilter = ['fandom_army'];
+    paramsChat.superChannelFilter = SBDGroupChannelSuperChannelFilter.NonSuper;
+    SBDMain.getTotalUnreadMessageCountWithParamsCompletionHandler(paramsChat, (totalCount, error) => {
+        this.setUnreadMessagesCount(this.channelsViewController, totalCount);
+    })
+    const paramsChatrooms = SBDGroupChannelTotalUnreadMessageCountParams.new();
+    // params.channelCustomTypesFilter = ['fandom_army'];
+    paramsChatrooms.superChannelFilter = SBDGroupChannelSuperChannelFilter.Super;
+    SBDMain.getTotalUnreadMessageCountWithParamsCompletionHandler(paramsChatrooms, (totalCount, error) => {
+      this.setUnreadMessagesCount(this.chatroomsViewController, totalCount);
+    })
+  }
+
+  setUnreadMessagesCount(viewController, totalCount: number) {
+    let badgeValue: String;
+
+    if (totalCount == 0) {
+        badgeValue = null;
+    } else if (totalCount > 99) {
+        badgeValue = "99+";
+    } else {
+        badgeValue = `${totalCount}`;
+    }
+
+    viewController.tabBarItem.badgeColor = SBUColorSet.error300
+    viewController.tabBarItem.badgeValue = badgeValue
+    viewController.tabBarItem.setBadgeTextAttributesForState(
+        {
+          [NSForegroundColorAttributeName] : this.isDarkMode
+                ? SBUColorSet.onlight01
+                : SBUColorSet.ondark01,
+          [NSFontAttributeName] : SBUFontSet.caption4
+        },
+        UIControlState.Normal
+    )
+
+  }
+
 }
 
 @NativeClass()
@@ -793,7 +874,36 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
 
   viewWillAppear() {
     console.log('VIEW WILL APPEAR SUPER>');
+    const paramsChatrooms = SBDGroupChannelTotalUnreadMessageCountParams.new();
+    // params.channelCustomTypesFilter = ['fandom_army'];
+    paramsChatrooms.superChannelFilter = SBDGroupChannelSuperChannelFilter.Super;
+    SBDMain.getTotalUnreadMessageCountWithParamsCompletionHandler(paramsChatrooms, (totalCount, error) => {
+      this.setUnreadMessagesCount(this, totalCount);
+    })
     this.setupStrings();
+  }
+
+  setUnreadMessagesCount(viewController, totalCount: number) {
+    let badgeValue: String;
+
+    if (totalCount == 0) {
+        badgeValue = null;
+    } else if (totalCount > 99) {
+        badgeValue = "99+";
+    } else {
+        badgeValue = `${totalCount}`;
+    }
+
+    viewController.tabBarItem.badgeColor = SBUColorSet.error300
+    viewController.tabBarItem.badgeValue = badgeValue
+    viewController.tabBarItem.setBadgeTextAttributesForState(
+        {
+          [NSForegroundColorAttributeName] : SBUColorSet.ondark01,
+          [NSFontAttributeName] : SBUFontSet.caption4
+        },
+        UIControlState.Normal
+    )
+
   }
 
   viewDidLoad() {

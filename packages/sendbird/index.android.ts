@@ -33,6 +33,23 @@ class GroupCreateChannelHandler extends com.sendbird.android.GroupChannel.GroupC
 		});
 	}
 }
+
+class GroupCreateDirectChannelHandler extends com.sendbird.android.GroupChannel.GroupChannelCreateHandler {
+	constructor(resolve, reject) {
+		super({
+			onResult(groupChannel: com.sendbird.android.GroupChannel, e: com.sendbird.android.SendBirdException) {
+				if (e != null) {
+					console.log('Sendbird Result Error');
+					console.log('e:', e)
+					return reject({ error: e });
+				}
+				console.log('Channel created');
+				return resolve({ data: groupChannel });
+			},
+		});
+	}
+}
+
 class EnterChannel extends com.sendbird.android.OpenChannel.OpenChannelGetHandler {
 	constructor(resolve, reject) {
 		super({
@@ -320,7 +337,23 @@ export class SendbirdUIKit {
 		}
 	}
 
-	setTheme(style: 'Light' | 'Dark'): void {
+  async createDirectChannel(userIds: string[]): Promise<{ data: com.sendbird.android.GroupChannel } | { error: com.sendbird.android.SendBirdException }> {
+    try {
+			const { data } = await new Promise((resolve, reject) => {
+        const channelHandler = new GroupCreateDirectChannelHandler(resolve, reject);
+        const test = new java.util.List<string>();
+        userIds.forEach(element => {
+          test.add(element);
+        });
+				com.sendbird.android.GroupChannel.createChannelWithUserIds(test, true, channelHandler);
+			});
+			return { data: data.getUrl() };
+		} catch (error) {
+			return { error };
+		}
+  }
+
+  setTheme(style: 'Light' | 'Dark'): void {
 		const theme = this.sendbirdUIKit.ThemeMode[style];
 		this.sendbirdUIKit.setDefaultThemeMode(theme);
 	}

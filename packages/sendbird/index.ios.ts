@@ -185,6 +185,21 @@ export class SendbirdUIKit {
     })
   }
 
+  createDirectChannel(userIds: string[]): Promise<{data: string}> {
+    return new Promise((resolve, reject) => {
+      SBDGroupChannel.createChannelWithUserIdsIsDistinctCompletionHandler(userIds, true, (groupChannel, error) => {
+        let channelUrl = groupChannel?.channelUrl;
+        if(error) {
+          console.log('Sendbird Create direct channel Error');
+          reject(error);
+          return;
+        }
+        resolve({data: channelUrl})
+        // SUCCESS ON CREATION
+      })
+    })
+  }
+
   joinChannel(channelUrl: string): Promise<void> {
     return new Promise((resolve, reject) => {
       SBDGroupChannel.getChannelWithUrlCompletionHandler(channelUrl, (channel: SBDGroupChannel, err: SBDError) => {

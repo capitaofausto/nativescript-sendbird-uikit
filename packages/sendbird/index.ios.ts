@@ -766,9 +766,6 @@ class MainChannelTabbarController extends UITabBarController {
       : type == "My chatrooms"
         ? this.resizeImage(UIImage.imageNamed("iconSupergroup"), iconSize)
         : this.resizeImage(UIImage.imageNamed("iconChatrooms"), iconSize);
-    /* type == "My chats"
-        ? (UIImage.imageNamed("iconChat") as any)//.sd_resizedImageWithSizeScaleMode(iconSize)
-        : (UIImage.imageNamed("iconChannels") as any)//.sd_resizedImageWithSizeScaleMode(iconSize) */
     let tag = type == "Channels" ? 0 : 1
 
     let item = new UITabBarItem({title: title, image: icon, tag: tag});
@@ -777,28 +774,20 @@ class MainChannelTabbarController extends UITabBarController {
 
   resizeImage(image: UIImage, targetSize: CGSize): UIImage {
     let size = image.size
+    let widthRatio  = targetSize.width  / size.width
+    let heightRatio = targetSize.height / size.height
+    let scale = widthRatio > heightRatio ? widthRatio : heightRatio;
 
-    let widthRatio  = targetSize.width  / image.size.width
-    let heightRatio = targetSize.height / image.size.height
+    let scaledImageSize = CGSizeMake(
+        size.width * scale,
+        size.height * scale
+    )
+    let renderer = new UIGraphicsImageRenderer({size: scaledImageSize});
 
-    // Figure out what our orientation is, and use that to form the rectangle
-    var newSize: CGSize
-    if(widthRatio > heightRatio) {
-        newSize = CGSizeMake(size.width * heightRatio, size.height * heightRatio);
-    } else {
-        newSize = CGSizeMake(size.width * widthRatio, size.height * widthRatio);
-    }
+    let scaledImage = renderer.imageWithActions( () => {
+      image.drawInRect(CGRectMake(0, 0, scaledImageSize.width, scaledImageSize.height))})
 
-    // This is the rect that we've calculated out and this is what is actually used below
-    let rect = CGRectMake(0, 0, newSize.width, newSize.height);
-
-    // Actually do the resizing to the rect using the ImageContext stuff
-    UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
-    image.drawInRect(rect);
-    let newImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-
-    return newImage!;
+    return scaledImage;
   }
 
   viewWillDisappear() {

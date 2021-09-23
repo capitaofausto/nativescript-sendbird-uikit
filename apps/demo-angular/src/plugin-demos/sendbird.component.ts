@@ -31,6 +31,13 @@ export class SendbirdComponent {
     this.sendbirdService.startUIKit();
   }
 
+  leaveChannel() {
+    this.sendbirdService.leaveChannel('sendbird_group_channel_105782747_5f6cc1525f336c0a3a22da13744637c230eb370a')
+    .subscribe(res => {
+      console.log('SO PARA VER', res);
+    })
+  }
+
 
   launchCreateChannel() {
     this.sendbirdService.createChannel().subscribe(res => {

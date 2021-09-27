@@ -1,5 +1,9 @@
 package com.tns;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,12 +11,44 @@ import android.view.LayoutInflater;
 import android.widget.SearchView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.sendbird.uikit.R;
-import com.sendbird.uikit.fragments.InviteChannelFragment;
+import com.sendbird.uikit.fragments.CreateChannelFragment;
 import com.sendbird.uikit.widgets.PagerRecyclerView;
+
+import org.nativescript.plugindemoangular.R;
+import com.sendbird.uikit.fragments.CreateChannelFragment;
+import com.sendbird.uikit.activities.adapter.UserListAdapter;
+import com.sendbird.android.GroupChannel;
+import com.sendbird.android.GroupChannelParams;
+import com.sendbird.uikit.interfaces.CustomParamsHandler;
 import java.util.List;
 
-public class CustomInviteChannelFragment extends InviteChannelFragment implements SearchView.OnQueryTextListener {
+public class CustomCreateChannelFragment extends CreateChannelFragment implements SearchView.OnQueryTextListener {
+
+    private List<String> userIds = new ArrayList<>();
+    private String selectedFandom;
+    private String channelName;
+
+    public CustomCreateChannelFragment() {
+        this.selectedFandom = null;
+        this.channelName = null;
+    }
+
+    public CustomCreateChannelFragment(String selectedFandom, String channelName) {
+        this.selectedFandom = selectedFandom;
+        this.channelName = channelName;
+    }
+
+    @Override
+    protected void onBeforeCreateGroupChannel(@NonNull GroupChannelParams params) {
+      super.onBeforeCreateGroupChannel(params);
+      params.addUserIds(userIds);
+      if(this.channelName != null) {
+        params.setName(this.channelName);
+      }
+      if(this.selectedFandom != null) {
+        params.setCustomType("fandom_"+this.selectedFandom.toLowerCase());
+      }
+    }
 
     @Nullable
     @Override

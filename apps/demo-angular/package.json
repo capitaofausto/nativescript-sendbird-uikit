@@ -1,8 +1,6 @@
 {
   "main": "./src/main.ts",
   "dependencies": {
-    "@nativescript/core": "file:../../node_modules/@nativescript/core",
-    "@jbento/nativescript-sendbird": "file:../../dist/packages/sendbird",
     "@angular/animations": "file:../../node_modules/@angular/animations",
     "@angular/common": "file:../../node_modules/@angular/common",
     "@angular/compiler": "file:../../node_modules/@angular/compiler",
@@ -11,7 +9,9 @@
     "@angular/platform-browser": "file:../../node_modules/@angular/platform-browser",
     "@angular/platform-browser-dynamic": "file:../../node_modules/@angular/platform-browser-dynamic",
     "@angular/router": "file:../../node_modules/@angular/router",
+    "@jbento/nativescript-sendbird": "file:../../dist/packages/sendbird",
     "@nativescript/angular": "file:../../node_modules/@nativescript/angular",
+    "@nativescript/core": "file:../../node_modules/@nativescript/core",
     "reflect-metadata": "file:../../node_modules/reflect-metadata",
     "rxjs": "file:../../node_modules/rxjs",
     "zone.js": "file:../../node_modules/zone.js"

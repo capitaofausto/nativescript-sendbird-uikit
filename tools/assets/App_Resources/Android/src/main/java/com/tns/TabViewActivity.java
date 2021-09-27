@@ -17,7 +17,6 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.databinding.DataBindingUtil;
 
 import org.nativescript.plugindemoangular.R;
-import org.nativescript.plugindemoangular.databinding.ActivityMainBinding;
 
 import com.google.android.material.tabs.TabLayout;
 
@@ -25,7 +24,6 @@ import com.sendbird.uikit.SendBirdUIKit;
 import com.sendbird.uikit.fragments.ChannelListFragment;
 import com.sendbird.uikit.fragments.OpenChannelFragment;
 import com.sendbird.uikit.consts.CreateableChannelType;
-import com.sendbird.uikit.utils.ContextUtils;
 
 import com.sendbird.android.User;
 import com.sendbird.android.GroupChannelTotalUnreadMessageCountParams;
@@ -36,8 +34,8 @@ import com.sendbird.android.GroupChannelListQuery.PublicChannelFilter;
 import com.sendbird.android.GroupChannelListQuery.SuperChannelFilter;
 
 
-import com.sendbird.fragments.CustomChannelListFragment;
-import com.sendbird.CustomTabView;
+import com.tns.CustomChannelListFragment;
+import com.tns.CustomTabView;
 
 import java.util.Objects;
 import java.util.Map;
@@ -45,7 +43,6 @@ import java.util.Map;
 public class TabViewActivity extends AppCompatActivity {
 
   private static final String USER_EVENT_HANDLER_KEY = "USER_EVENT_HANDLER_KEY" + System.currentTimeMillis();
-  private ActivityMainBinding binding;
   private CustomTabView publicGroupTab;
   private CustomTabView supergroupTab;
   private GroupChannelTotalUnreadMessageCountParams superGroupCountParams;
@@ -113,22 +110,6 @@ public class TabViewActivity extends AppCompatActivity {
           tabView.setBadgeVisibility(View.GONE);
       }
     });
-
-    // SendBird.addUserEventHandler(USER_EVENT_HANDLER_KEY, new SendBird.UserEventHandler() {
-    //     @Override
-    //     public void onFriendsDiscovered(List<User> list) {}
-
-    //     // @Override
-    //     // public void onTotalUnreadMessageCountChanged(int totalCount, Map<String, Integer> totalCountByCustomType) {
-    //     //   tabView.setBadgeVisibility(View.VISIBLE);
-    //     //   tabView.setBadgeCount(getString(R.string.text_tab_badge_max_count));
-    //     //           // String.valueOf(totalCount));
-    //     //     // if (totalCount > 0) {
-    //     //     // } else {
-    //     //     //     tabView.setBadgeVisibility(View.GONE);
-    //     //     // }
-    //     //   };
-    // });
   }
 
   private class MainAdapter extends FragmentPagerAdapter {
@@ -158,6 +139,7 @@ public class TabViewActivity extends AppCompatActivity {
         return new ChannelListFragment
           .Builder()
           .setCustomChannelListFragment(customGroupFragmentInstance)
+          .setItemClickListener((view, i, channel) -> showCustomChannelActivity(channel.getUrl()))
           .setUseHeader(true)
           .setGroupChannelListQuery(privateGroupChannelsQuery)
           .build();
@@ -189,6 +171,11 @@ public class TabViewActivity extends AppCompatActivity {
         // showCustomChannelActivity(channelUrl);
         intent.removeExtra("PUSH_REDIRECT_CHANNEL");
     }
-}
+  }
+
+  private void showCustomChannelActivity(String channelUrl) {
+    Intent intent = CustomChannelActivity.newIntentFromCustomActivity(TabViewActivity.this, CustomChannelActivity.class, channelUrl);
+    startActivity(intent);
+  }
 }
 

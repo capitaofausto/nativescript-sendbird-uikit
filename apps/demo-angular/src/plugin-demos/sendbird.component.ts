@@ -62,6 +62,10 @@ export class SendbirdComponent {
 		this.sendbirdService.receiveMessages(this.channelUrl);
 	}
 
+  privateChat() {
+    this.sendbirdService.launchPrivateChat()
+  }
+
 	// receiveMessages() {
 	//   this.sendbird.receiveMessages(this.channelUrl);
 	// }

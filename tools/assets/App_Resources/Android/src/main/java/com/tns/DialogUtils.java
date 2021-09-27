@@ -1,4 +1,4 @@
-package com.sendbird.utils;
+package com.tns;
 
 import android.content.Context;
 import android.content.Intent;

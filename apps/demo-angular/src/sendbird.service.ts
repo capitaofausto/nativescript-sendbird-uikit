@@ -70,4 +70,9 @@ export class SendbirdService {
     return from(this.sendbird.leaveChannel(channelUrl));
   }
 
+  launchPrivateChat() {
+    const userIds = ['6074541cecb19f6f8ef8c156', '605b5fb90c98fc2b1923929f']
+    this.sendbirdUIKit.createDirectChannel(userIds)
+  }
+
 }

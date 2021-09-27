@@ -305,7 +305,7 @@ export class SendbirdUIKit {
 		activity.startActivity(intent);
 	}
 
-	launchTabs(cb: void, filters: SendbirdFilters) {
+	launchTabs(cb: void, cbNavigate: void, filters: SendbirdFilters) {
 		var context = application.android.context;
     var intent = new android.content.Intent(context, (com as any).tns.TabViewActivity.class);
     intent.putExtra("fandoms", filters.fandom.join(','));

@@ -1,5 +1,7 @@
-import { SendbirdCommon, APP_ID, dismissCallback, SendbirdFilters } from './common';
-import { Utils, Frame, prompt, PromptOptions, inputType, capitalizationType, PromptResult } from '@nativescript/core';
+import { SendbirdCommon, APP_ID, sendbirdCallback, SendbirdFilters } from './common';
+import { Utils, Frame, PromptResult } from '@nativescript/core';
+import { setString } from '@nativescript/core/application-settings';
+
 
 export class Sendbird extends SendbirdCommon {
 
@@ -136,6 +138,8 @@ export class Sendbird extends SendbirdCommon {
 export class SendbirdUIKit {
   delegateUi: ChannelListViewController;
   delegateTabsUi: MainChannelTabbarController;
+  static dismissCallback: sendbirdCallback;
+  static navigateCallback: sendbirdCallback;
 
   setCurrentUser(userId: string, nickname: string, profileUrl: string) {
     SBUGlobals.CurrentUser = new SBUUser({userId, nickname, profileUrl });
@@ -147,7 +151,7 @@ export class SendbirdUIKit {
     this.setCurrentUser(userId, nickname, profileUrl);
   }
 
-  launch(callback: dismissCallback) {
+  launch(dismissCallback: sendbirdCallback) {
     const app = UIApplication.sharedApplication;
     const win = app.keyWindow || (app.windows && app.windows.count > 0 && app.windows.objectAtIndex(0));
     let viewController = win.rootViewController;
@@ -155,7 +159,8 @@ export class SendbirdUIKit {
     let channelListTheme = SBUChannelListTheme.new();
     channelListTheme.navigationBarTintColor = color;
     SBUTheme.setChannelListTheme(channelListTheme);
-    this.delegateUi = new ChannelListViewController(callback);
+    SendbirdUIKit.dismissCallback = dismissCallback;
+    this.delegateUi = new ChannelListViewController();
     this.delegateUi._owner = new WeakRef(this);
     let naviVC = new UINavigationController({ rootViewController: this.delegateUi });
     naviVC.modalPresentationStyle = UIModalPresentationStyle.FullScreen;
@@ -232,11 +237,13 @@ export class SendbirdUIKit {
     Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(naviVC, true, () => { console.log('View channel completed') });
   }
 
-  launchTabs(callback: dismissCallback, filters: SendbirdFilters = {}) {
+  launchTabs(dismissCallback: sendbirdCallback, navigateCallback: sendbirdCallback, filters: SendbirdFilters = {}) {
     const app = UIApplication.sharedApplication;
     const win = app.keyWindow || (app.windows && app.windows.count > 0 && app.windows.objectAtIndex(0));
     let viewController = win.rootViewController;
-    this.delegateTabsUi = new MainChannelTabbarController(callback, filters);
+    SendbirdUIKit.navigateCallback = navigateCallback;
+    SendbirdUIKit.dismissCallback = dismissCallback;
+    this.delegateTabsUi = new MainChannelTabbarController(filters);
     this.delegateTabsUi._owner = new WeakRef(this);
     //let naviVC = new UINavigationController({rootViewController: this.delegateTabsUi });
     this.delegateTabsUi.modalPresentationStyle = UIModalPresentationStyle.FullScreen;
@@ -256,15 +263,13 @@ class ChannelListViewController extends SBUChannelListViewController {
   _owner: WeakRef<any>;
   titleView: SBUNavigationTitleView;
   viewDidLoaded: boolean;
-  dismissCallback: dismissCallback;
 
-  constructor(dismissCalback: dismissCallback) {
+  constructor() {
     let listQuery = SBDGroupChannel.createMyGroupChannelListQuery();
     listQuery.superChannelFilter = SBDGroupChannelSuperChannelFilter.NonSuper;
     listQuery.includeEmptyChannel = true;
 
     super({channelListQuery: listQuery});
-    this.dismissCallback = dismissCalback;
   }
 
 	static new(): ChannelListViewController {
@@ -373,8 +378,8 @@ class ChannelListViewController extends SBUChannelListViewController {
 
   viewWillDisappear() {
 		super.viewWillDisappear(true);
-    if(this.dismissCallback) {
-      this.dismissCallback();
+    if(SendbirdUIKit.dismissCallback) {
+      SendbirdUIKit.dismissCallback();
     }
   }
 
@@ -539,7 +544,8 @@ class ChannelSettingsViewController extends SBUChannelSettingsViewController {
 class MemberListViewController extends SBUMemberListViewController {
 
   public static ObjCExposedMethods = {
-    onClickInviteUser: { returns: interop.types.void}
+    onClickInviteUser: { returns: interop.types.void},
+    tableViewDidSelectRowAtIndexPath: { returns: interop.types.void, params: [UITableView, NSIndexPath]}
   };
 
   constructor(channel: SBDGroupChannel) {
@@ -556,6 +562,22 @@ class MemberListViewController extends SBUMemberListViewController {
 
     const inviteUserVC = new InviteUserViewController(channel, type);
     this.navigationController.pushViewControllerAnimated(inviteUserVC, true);
+  }
+
+  tableViewDidSelectRowAtIndexPath(tableView: UITableView, indexPath: NSIndexPath) {
+    console.log('-------------------');
+    console.log('--OVERRIDE WORKED !!!!--');
+    console.log('-------------------');
+    const user = this.memberList[indexPath.row];
+    setString('sendbirdUserId', user.userId);
+    // this.navigationController?.popViewControllerAnimated(true);
+    this.navigationController?.popToRootViewControllerAnimated(true);
+    const app = UIApplication.sharedApplication;
+    const win = app.keyWindow || (app.windows && app.windows.count > 0 && app.windows.objectAtIndex(0));
+    let viewController = win.rootViewController;
+    // this.tabBarController?.dismissViewControllerAnimatedCompletion(true);
+    viewController.dismissViewControllerAnimatedCompletion(true, () => {SendbirdUIKit.navigateCallback()});
+    // Utils.openUrl('fave://entry/602fd35fcc8e1e8491b09d2e');
   }
 }
 
@@ -652,13 +674,11 @@ class MainChannelTabbarController extends UITabBarController {
   viewControllers;
 
   isDarkMode: boolean = false;
-  dismissCallback: dismissCallback;
   filters: SendbirdFilters;
   _owner: WeakRef<any>;
 
-  constructor(dismissCalback: dismissCallback, filters: SendbirdFilters) {
+  constructor(filters: SendbirdFilters) {
     super({coder: null});
-    this.dismissCallback = dismissCalback;
     this.filters = filters;
   }
 
@@ -676,7 +696,7 @@ class MainChannelTabbarController extends UITabBarController {
 		console.log('VIEW DID LOAD CHANNELS');
 		super.viewDidLoad();
 
-    const channelsViewController = new ChannelListViewController(null);
+    const channelsViewController = new ChannelListViewController();
     // channelsViewController._owner = new WeakRef(this);
     channelsViewController.titleView = SBUNavigationTitleView.new();
     channelsViewController.titleView.text = "My chats";
@@ -697,7 +717,7 @@ class MainChannelTabbarController extends UITabBarController {
     listQuery.customTypesFilter = new NSArray({array: customFiltersArray});
     /* MY SUPERGROUPS QUERY */
 
-    const mySupergroupsViewController = new SupergroupChannelListViewController(null, this.filters, listQuery);
+    const mySupergroupsViewController = new SupergroupChannelListViewController(this.filters, listQuery);
     mySupergroupsViewController.titleView = SBUNavigationTitleView.new();
     mySupergroupsViewController.titleView.text = "My chatrooms";
     mySupergroupsViewController.titleView.textAlignment = NSTextAlignment.Center;
@@ -766,9 +786,6 @@ class MainChannelTabbarController extends UITabBarController {
       : type == "My chatrooms"
         ? this.resizeImage(UIImage.imageNamed("iconSupergroup"), iconSize)
         : this.resizeImage(UIImage.imageNamed("iconChatrooms"), iconSize);
-    /* type == "My chats"
-        ? (UIImage.imageNamed("iconChat") as any)//.sd_resizedImageWithSizeScaleMode(iconSize)
-        : (UIImage.imageNamed("iconChannels") as any)//.sd_resizedImageWithSizeScaleMode(iconSize) */
     let tag = type == "Channels" ? 0 : 1
 
     let item = new UITabBarItem({title: title, image: icon, tag: tag});
@@ -777,35 +794,27 @@ class MainChannelTabbarController extends UITabBarController {
 
   resizeImage(image: UIImage, targetSize: CGSize): UIImage {
     let size = image.size
+    let widthRatio  = targetSize.width  / size.width
+    let heightRatio = targetSize.height / size.height
+    let scale = widthRatio > heightRatio ? widthRatio : heightRatio;
 
-    let widthRatio  = targetSize.width  / image.size.width
-    let heightRatio = targetSize.height / image.size.height
+    let scaledImageSize = CGSizeMake(
+        size.width * scale,
+        size.height * scale
+    )
+    let renderer = new UIGraphicsImageRenderer({size: scaledImageSize});
 
-    // Figure out what our orientation is, and use that to form the rectangle
-    var newSize: CGSize
-    if(widthRatio > heightRatio) {
-        newSize = CGSizeMake(size.width * heightRatio, size.height * heightRatio);
-    } else {
-        newSize = CGSizeMake(size.width * widthRatio, size.height * widthRatio);
-    }
+    let scaledImage = renderer.imageWithActions( () => {
+      image.drawInRect(CGRectMake(0, 0, scaledImageSize.width, scaledImageSize.height))})
 
-    // This is the rect that we've calculated out and this is what is actually used below
-    let rect = CGRectMake(0, 0, newSize.width, newSize.height);
-
-    // Actually do the resizing to the rect using the ImageContext stuff
-    UIGraphicsBeginImageContextWithOptions(newSize, false, 1.0)
-    image.drawInRect(rect);
-    let newImage = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-
-    return newImage!;
+    return scaledImage;
   }
 
   viewWillDisappear() {
 		super.viewWillDisappear(true);
-    if(this.dismissCallback) {
-      this.dismissCallback();
-    }
+    /* if(SendbirdUIKit.dismissCallback) {
+      SendbirdUIKit.dismissCallback();
+    } */
   }
 
   loadTotalUnreadMessageCount() {
@@ -862,13 +871,11 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
   _owner: WeakRef<any>;
   filters: SendbirdFilters;
   titleView: SBUNavigationTitleView;
-  dismissCallback: dismissCallback;
 
-  constructor(dismissCalback: dismissCallback, filters: SendbirdFilters, listQuery: any) {
+  constructor(filters: SendbirdFilters, listQuery: any) {
     // listQuery.publicChannelFilter = SBDGroupChannelPublicChannelFilter.Public;
     super({channelListQuery: listQuery});
     this.filters = filters;
-    this.dismissCallback = dismissCalback;
   }
 
   didSelectActionSheetItemWithIndexIdentifier(index: number, identifier: number): void {
@@ -953,8 +960,8 @@ class SupergroupChannelListViewController extends SBUChannelListViewController i
 
   viewWillDisappear() {
 		super.viewWillDisappear(true);
-    if(this.dismissCallback) {
-      this.dismissCallback();
+    if(SendbirdUIKit.dismissCallback) {
+      SendbirdUIKit.dismissCallback();
     }
   }
 

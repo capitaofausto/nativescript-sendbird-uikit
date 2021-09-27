@@ -26,7 +26,7 @@ export declare class SendbirdUIKit {
   createDirectChannel(userIds: string[]): Promise<{data: string}> {}
   joinChannel(channelUrl: string): Promise<void>
   launchChannel(channelUrl: string);
-  launchTabs(callback: dismissCallback, filters?: SendbirdFilters);
+  launchTabs(callback: dismissCallback, navigateCallback: dismissCallback, filters?: SendbirdFilters);
   setCurrentUser(userId: string, nickname: string, profileUrl: string);
   setTheme(style: 'Light' | 'Dark'): void {}
 }

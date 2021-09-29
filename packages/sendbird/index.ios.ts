@@ -223,7 +223,7 @@ export class SendbirdUIKit {
     });
   }
 
-  launchChannel(channelUrl: string) {
+  launchChannel(channelUrl: string, navigateCallback: sendbirdCallback) {
     const app = UIApplication.sharedApplication;
     const win = app.keyWindow || (app.windows && app.windows.count > 0 && app.windows.objectAtIndex(0));
     let viewController = win.rootViewController;
@@ -231,7 +231,7 @@ export class SendbirdUIKit {
     const delegateUi = new ChannelViewController(channelUrl);
     //this.delegateUi.initWithChannelUrlMessageListParams(channelUrl, null);
     //delegateUi._owner = new WeakRef(this);
-
+    SendbirdUIKit.navigateCallback = navigateCallback;
     let naviVC = new UINavigationController({ rootViewController: delegateUi });
     naviVC.modalPresentationStyle = 0 // FullScreen;
     Utils.ios.getVisibleViewController(viewController).presentViewControllerAnimatedCompletion(naviVC, true, () => { console.log('View channel completed') });

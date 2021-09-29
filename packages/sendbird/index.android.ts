@@ -341,9 +341,9 @@ export class SendbirdUIKit {
     try {
 			const { data } = await new Promise((resolve, reject) => {
         const channelHandler = new GroupCreateDirectChannelHandler(resolve, reject);
-        const test = new java.util.List<string>();
+        const test = new java.util.ArrayList<string>();
         userIds.forEach(element => {
-          test.add(element);
+					test.add(element);
         });
 				com.sendbird.android.GroupChannel.createChannelWithUserIds(test, true, channelHandler);
 			});

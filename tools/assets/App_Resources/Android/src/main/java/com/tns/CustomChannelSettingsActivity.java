@@ -25,8 +25,8 @@ public class CustomChannelSettingsActivity extends ChannelSettingsActivity {
                     @Override
                     public boolean onMenuItemClicked(View view, ChannelSettingsView.ChannelSettingMenu menu, GroupChannel data) {
                         if (menu == ChannelSettingsView.ChannelSettingMenu.MEMBERS) {
+                          customFragmentInstance.startActivity(CustomMemberListActivity.newIntent(customFragmentInstance.getContext(), channelUrl));
                             if (!(customFragmentInstance.isRemoving() || customFragmentInstance.isDetached() || customFragmentInstance.getContext() == null)) {
-                                customFragmentInstance.startActivity(CustomMemberListActivity.newIntent(customFragmentInstance.getContext(), channelUrl));
                             }
                             return true;
                         }

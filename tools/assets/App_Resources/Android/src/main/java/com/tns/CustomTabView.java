@@ -1,4 +1,4 @@
-package com.sendbird;
+package com.tns;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -13,8 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import org.nativescript.plugindemoangular.R;
-import com.sendbird.utils.DrawableUtils;
-import com.sendbird.utils.PreferenceUtils;
+import com.tns.DrawableUtils;
+import com.tns.PreferenceUtils;
 
 public class CustomTabView extends FrameLayout {
     private int tintColorRedId;
